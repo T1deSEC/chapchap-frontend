@@ -12,17 +12,20 @@ interface Props {
   month: number
   entries: DiaryEntry[]
   onMonthChange: (year: number, month: number) => void
+  onDayClick?: (entry: DiaryEntry) => void
 }
 
-export default function DiaryCalendar({ year, month, entries, onMonthChange }: Props) {
+export default function DiaryCalendar({ year, month, entries, onMonthChange, onDayClick }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerYear, setPickerYear] = useState(year)
 
   const moodByDay: Record<number, string> = {}
+  const entryByDay: Record<number, DiaryEntry> = {}
   entries.forEach((e) => {
     const [y, m, d] = e.date.split('-').map(Number)
     if (y === year && m === month) {
       moodByDay[d] = e.mood
+      entryByDay[d] = e
     }
   })
 
@@ -118,10 +121,17 @@ export default function DiaryCalendar({ year, month, entries, onMonthChange }: P
           <div key={d} className="font-bold text-xs">{d}</div>
         ))}
         {cells.map((day, i) => (
-          <div key={i} className="text-gray-800 dark:text-gray-200 font-medium text-xs">
+          <div key={day !== null ? `${year}-${month}-${day}` : `empty-${i}`} className="text-gray-800 dark:text-gray-200 font-medium text-xs">
             {day !== null ? (
               moodByDay[day] ? (
-                <span className="text-xl">{MOOD_MAP[moodByDay[day]] ?? '😐'}</span>
+                <button
+                  type="button"
+                  onClick={() => onDayClick?.(entryByDay[day])}
+                  className="text-xl leading-none hover:scale-110 transition-transform"
+                  aria-label={`${day}일 일기 보기`}
+                >
+                  {MOOD_MAP[moodByDay[day]] ?? '😐'}
+                </button>
               ) : (
                 day
               )

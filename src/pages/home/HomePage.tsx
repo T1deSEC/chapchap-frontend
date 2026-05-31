@@ -98,6 +98,7 @@ export default function HomePage() {
               month={month}
               entries={diaryEntries}
               onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
+              onDayClick={(entry) => navigate(`/home/diary/${entry.id}`)}
             />
           )}
         </section>

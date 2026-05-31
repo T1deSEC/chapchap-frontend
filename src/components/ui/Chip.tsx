@@ -6,8 +6,10 @@ interface ChipProps {
 
 export default function Chip({ children, active, onClick }: ChipProps) {
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`flex h-8 shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-colors ${
         active
           ? 'bg-primary text-white'
@@ -15,6 +17,6 @@ export default function Chip({ children, active, onClick }: ChipProps) {
       }`}
     >
       {children}
-    </div>
+    </button>
   )
 }

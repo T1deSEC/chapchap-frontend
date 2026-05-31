@@ -28,7 +28,7 @@ describe('Input', () => {
 describe('Chip', () => {
   it('active 상태에서 primary 배경 클래스를 가진다', () => {
     render(<Chip active>미백</Chip>)
-    const chip = screen.getByText('미백').closest('div')!
+    const chip = screen.getByRole('button', { name: '미백' })
     expect(chip.className).toContain('bg-primary')
   })
 

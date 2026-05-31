@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreateDiaryMutation } from '../../hooks/useHome'
 import Button from '../../components/ui/Button'
+import type { DiaryEntry } from '../../types'
 
 const MOOD_OPTIONS = [
   { value: 'terrible', emoji: '😡' },
@@ -20,7 +21,7 @@ export default function DiaryWritePage() {
   const today = new Date().toISOString().split('T')[0]
   const [y, m, d] = today.split('-')
 
-  const [mood, setMood] = useState<string>('')
+  const [mood, setMood] = useState<DiaryEntry['mood'] | ''>('')
   const [keywords, setKeywords] = useState<string[]>([])
   const [note, setNote] = useState('')
 

@@ -5,7 +5,6 @@ import {
   createDiaryEntry,
   deleteDiaryEntry,
 } from '../api/home'
-import type { DiaryEntry } from '../types'
 import type { CreateDiaryPayload } from '../api/home'
 
 export const useDiaryEntries = (year: number, month: number) =>

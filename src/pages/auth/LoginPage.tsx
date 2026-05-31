@@ -64,6 +64,24 @@ export default function LoginPage() {
         계정이 없으신가요?{' '}
         <a href="/register" className="text-primary font-medium">회원가입</a>
       </p>
+
+      {import.meta.env.DEV && (
+        <button
+          type="button"
+          onClick={() => {
+            loginStore('dev-token', {
+              id: 1,
+              name: '개발자',
+              email: 'dev@chapchap.com',
+              skinType: '복합성',
+            })
+            navigate('/home')
+          }}
+          className="mt-8 text-xs text-gray-400 underline"
+        >
+          [개발용] 백엔드 없이 로그인
+        </button>
+      )}
     </div>
   )
 }

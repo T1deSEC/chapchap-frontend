@@ -33,7 +33,7 @@ export const useCreateDiaryMutation = () => {
 export const useDeleteDiaryMutation = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: deleteDiaryEntry,
+    mutationFn: (id: number) => deleteDiaryEntry(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['diary'] }),
   })
 }

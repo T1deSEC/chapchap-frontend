@@ -26,3 +26,15 @@ dist-ssr
 # Environment files
 .env.local
 .env.*.local
+
+# HTML prototypes (visual reference only, not part of React project)
+chap_home/
+chap_ingredient/
+chap_myprofile/
+chap_routine/
+
+# Planning docs and Claude metadata
+docs/
+.claude/
+.superpowers/
+CLAUDE.md

@@ -91,3 +91,19 @@ export interface ProductFeedbackPayload {
   usagePeriod: string
   comment: string
 }
+
+export interface RoutineItem {
+  id: number
+  productId: number
+  productName: string
+  brand: string
+  imageUrl: string
+  order: number
+}
+
+export interface RecommendedRoutine {
+  id: number
+  name: string
+  description: string
+  skinTypes: string[]
+}

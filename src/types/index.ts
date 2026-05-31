@@ -107,3 +107,37 @@ export interface RecommendedRoutine {
   description: string
   skinTypes: string[]
 }
+
+export interface UserProfile {
+  id: number
+  name: string
+  email: string
+  skinType: string
+  skinTone: string
+  skinConcerns: string[]
+  avatarUrl?: string
+}
+
+export interface WishlistItem {
+  id: number
+  productId: number
+  productName: string
+  brand: string
+  imageUrl: string
+  tag?: string
+}
+
+export interface FeedbackRecord {
+  id: number
+  productId: number
+  productName: string
+  brand: string
+  imageUrl: string
+  tags: string[]
+  createdAt: string
+}
+
+export interface SkinProfilePayload {
+  skinType: string
+  skinConcerns: string[]
+}

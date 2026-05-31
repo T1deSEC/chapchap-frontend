@@ -16,7 +16,7 @@ export const useDiaryEntries = (year: number, month: number) =>
 
 export const useDiaryEntry = (id: number) =>
   useQuery({
-    queryKey: ['diary', id],
+    queryKey: ['diary', 'detail', id],
     queryFn: () => getDiaryEntry(id).then((r) => r.data),
     enabled: id > 0,
   })

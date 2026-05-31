@@ -20,9 +20,9 @@ export default function DiaryCalendar({ year, month, entries, onMonthChange }: P
 
   const moodByDay: Record<number, string> = {}
   entries.forEach((e) => {
-    const d = new Date(e.date)
-    if (d.getFullYear() === year && d.getMonth() + 1 === month) {
-      moodByDay[d.getDate()] = e.mood
+    const [y, m, d] = e.date.split('-').map(Number)
+    if (y === year && m === month) {
+      moodByDay[d] = e.mood
     }
   })
 
@@ -91,7 +91,7 @@ export default function DiaryCalendar({ year, month, entries, onMonthChange }: P
                 <div className="grid grid-cols-3 gap-1">
                   {MONTHS.map((label, i) => (
                     <button
-                      key={i}
+                      key={`month-${i + 1}`}
                       type="button"
                       onClick={() => handleMonthSelect(i + 1)}
                       className="py-1 text-xs rounded hover:bg-blue-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"

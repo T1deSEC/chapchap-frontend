@@ -46,7 +46,6 @@ export default function DiaryCalendar({ year, month, entries, onMonthChange }: P
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold text-gray-800 dark:text-white">피부 일기</h2>
         <div className="flex items-center gap-1">
           <button
             type="button"

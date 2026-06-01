@@ -109,13 +109,15 @@ export interface WishlistItem {
   imageUrl: string
 }
 
+export type FeedbackReaction = 'good' | 'neutral' | 'trouble'
+
 export interface FeedbackRecord {
   id: number
   productId: number
   productName: string
   brand: string
   imageUrl: string
-  reaction: 'good' | 'neutral' | 'trouble'
+  reaction: FeedbackReaction
   isEffective: boolean
   memo: string
   createdAt: string
@@ -123,7 +125,7 @@ export interface FeedbackRecord {
 
 export interface ProductFeedbackPayload {
   productId: number
-  reaction: 'good' | 'neutral' | 'trouble'
+  reaction: FeedbackReaction
   memo: string
 }
 

@@ -1,11 +1,11 @@
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import apiClient from '../client'
 import {
-  searchIngredients,
+  searchProducts,
   getProductDetail,
   runAiIngredientAnalysis,
-  submitProductFeedback,
 } from '../ingredient'
+import { submitFeedback } from '../feedback'
 
 vi.mock('../client', () => ({ default: { get: vi.fn(), post: vi.fn() } }))
 const mockGet = vi.mocked(apiClient.get)
@@ -14,11 +14,11 @@ const mockPost = vi.mocked(apiClient.post)
 beforeEach(() => vi.clearAllMocks())
 
 describe('ingredient api', () => {
-  it('searchIngredients는 /api/ingredients/search로 GET 요청을 보낸다', async () => {
+  it('searchProducts는 /api/products로 GET 요청을 보낸다', async () => {
     mockGet.mockResolvedValueOnce({ data: [] })
-    await searchIngredients('나이아신아마이드', '미백')
-    expect(mockGet).toHaveBeenCalledWith('/api/ingredients/search', {
-      params: { query: '나이아신아마이드', filter: '미백' },
+    await searchProducts('나이아신아마이드', '미백')
+    expect(mockGet).toHaveBeenCalledWith('/api/products', {
+      params: { search: '나이아신아마이드', category: '미백' },
     })
   })
 
@@ -30,14 +30,18 @@ describe('ingredient api', () => {
 
   it('runAiIngredientAnalysis는 /api/analysis/ingredient로 POST 요청을 보낸다', async () => {
     mockPost.mockResolvedValueOnce({ data: {} })
-    await runAiIngredientAnalysis()
-    expect(mockPost).toHaveBeenCalledWith('/api/analysis/ingredient')
+    await runAiIngredientAnalysis(1, '건성', ['여드름'])
+    expect(mockPost).toHaveBeenCalledWith('/api/analysis/ingredient', {
+      productId: 1,
+      userSkinType: '건성',
+      userSkinConcerns: ['여드름'],
+    })
   })
 
-  it('submitProductFeedback은 /api/products/:id/feedback으로 POST 요청을 보낸다', async () => {
+  it('submitFeedback은 /api/feedback으로 POST 요청을 보낸다', async () => {
     mockPost.mockResolvedValueOnce({ data: {} })
-    const payload = { reaction: '좋음' as const, rating: 4, usagePeriod: '2-4주', comment: '' }
-    await submitProductFeedback(1, payload)
-    expect(mockPost).toHaveBeenCalledWith('/api/products/1/feedback', payload)
+    const payload = { productId: 1, reaction: 'good' as const, memo: '좋아요' }
+    await submitFeedback(payload)
+    expect(mockPost).toHaveBeenCalledWith('/api/feedback', payload)
   })
 })

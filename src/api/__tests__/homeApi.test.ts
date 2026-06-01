@@ -9,7 +9,7 @@ import {
 import { getRecommendedProducts } from '../products'
 import { getNotifications } from '../notifications'
 
-vi.mock('../client', () => ({ default: { get: vi.fn(), post: vi.fn(), delete: vi.fn() } }))
+vi.mock('../client', () => ({ default: { get: vi.fn(), post: vi.fn(), delete: vi.fn(), put: vi.fn() } }))
 const mockGet = vi.mocked(apiClient.get)
 const mockPost = vi.mocked(apiClient.post)
 const mockDelete = vi.mocked(apiClient.delete)
@@ -43,17 +43,17 @@ describe('home api', () => {
 })
 
 describe('products api', () => {
-  it('getRecommendedProducts는 /api/products/recommended로 GET 요청을 보낸다', async () => {
+  it('getRecommendedProducts는 /api/recommendations로 GET 요청을 보낸다', async () => {
     mockGet.mockResolvedValueOnce({ data: [] })
     await getRecommendedProducts()
-    expect(mockGet).toHaveBeenCalledWith('/api/products/recommended')
+    expect(mockGet).toHaveBeenCalledWith('/api/recommendations')
   })
 })
 
 describe('notifications api', () => {
-  it('getNotifications는 /api/notifications로 GET 요청을 보낸다', async () => {
+  it('getNotifications는 /api/notifications로 GET 요청을 보낸다 (page/size 파라미터 포함)', async () => {
     mockGet.mockResolvedValueOnce({ data: [] })
     await getNotifications()
-    expect(mockGet).toHaveBeenCalledWith('/api/notifications')
+    expect(mockGet).toHaveBeenCalledWith('/api/notifications', { params: { page: 0, size: 20 } })
   })
 })

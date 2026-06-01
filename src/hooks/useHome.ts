@@ -3,9 +3,10 @@ import {
   getDiaryEntries,
   getDiaryEntry,
   createDiaryEntry,
+  updateDiaryEntry,
   deleteDiaryEntry,
 } from '../api/home'
-import type { CreateDiaryPayload } from '../api/home'
+import type { CreateDiaryPayload, UpdateDiaryPayload } from '../api/home'
 
 export const useDiaryEntries = (year: number, month: number) =>
   useQuery({
@@ -23,8 +24,15 @@ export const useDiaryEntry = (id: number) =>
 export const useCreateDiaryMutation = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (payload: CreateDiaryPayload) =>
-      createDiaryEntry(payload).then((r) => r.data),
+    mutationFn: (payload: CreateDiaryPayload) => createDiaryEntry(payload).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['diary'] }),
+  })
+}
+
+export const useUpdateDiaryMutation = (id: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: UpdateDiaryPayload) => updateDiaryEntry(id, payload).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['diary'] }),
   })
 }

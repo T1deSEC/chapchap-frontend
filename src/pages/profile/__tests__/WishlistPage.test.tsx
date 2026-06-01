@@ -3,14 +3,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import WishlistPage from '../WishlistPage'
-import * as profileApi from '../../../api/profile'
+import * as wishlistApi from '../../../api/wishlist'
 
-vi.mock('../../../api/profile')
+vi.mock('../../../api/wishlist')
 
 function renderWishlist() {
-  vi.mocked(profileApi.getWishlist).mockResolvedValue({ data: [
-    { id: 1, productId: 1, productName: '그린티 씨드 세럼', brand: '이니스프리', imageUrl: '', tag: '추천!' },
-    { id: 2, productId: 2, productName: '시카페어 크림', brand: '닥터자르트', imageUrl: '', tag: '진정 효과' },
+  vi.mocked(wishlistApi.getWishlist).mockResolvedValue({ data: [
+    { id: 1, productId: 1, productName: '그린티 씨드 세럼', brand: '이니스프리', imageUrl: '' },
+    { id: 2, productId: 2, productName: '시카페어 크림', brand: '닥터자르트', imageUrl: '' },
   ] } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(<QueryClientProvider client={qc}><MemoryRouter><WishlistPage /></MemoryRouter></QueryClientProvider>)

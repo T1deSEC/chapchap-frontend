@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useWishlist } from '../../hooks/useProfile'
+import { useWishlist } from '../../hooks/useWishlist'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 export default function WishlistPage() {
@@ -36,7 +36,6 @@ export default function WishlistPage() {
                   <div className="flex flex-col">
                     <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{item.brand}</span>
                     <h3 className="font-bold text-gray-800 dark:text-gray-100">{item.productName}</h3>
-                    {item.tag && <span className="mt-2 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary dark:bg-primary/20 w-fit">{item.tag}</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

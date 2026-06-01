@@ -1,60 +1,84 @@
 import { Link } from 'react-router-dom'
 import { useAnalysisStore } from '../../store/analysisStore'
-import type { AiIngredientResult } from '../../types'
+
+const SAFETY_STYLES = {
+  safe:    { badge: 'bg-green-500', text: '안전', border: '' },
+  caution: { badge: 'bg-yellow-400', text: '주의', border: 'border border-yellow-400' },
+  warning: { badge: 'bg-red-500',   text: '위험', border: 'border-2 border-red-500' },
+}
 
 export default function AiAnalysisResultPage() {
-  const raw = useAnalysisStore((s) => s.ingredientResult)
+  const result = useAnalysisStore((s) => s.ingredientResult)
 
-  let result: AiIngredientResult = { recommendedProducts: [] }
-  if (raw?.summary) {
-    try { result = JSON.parse(raw.summary) as AiIngredientResult } catch { /* ignore */ }
+  if (!result) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background-light dark:bg-background-dark gap-4">
+        <p className="text-gray-500 dark:text-gray-400">분석 결과가 없습니다.</p>
+        <Link to="/ingredient" className="text-primary font-medium">돌아가기</Link>
+      </div>
+    )
   }
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden pb-24">
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-background-light p-4 dark:bg-background-dark">
-        <Link to="/ingredient" className="flex size-10 items-center justify-center rounded-full text-[#111318] dark:text-white">
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-background-light p-4 dark:bg-background-dark border-b border-gray-200 dark:border-gray-800">
+        <Link to="/ingredient" className="flex size-10 items-center justify-center text-[#111318] dark:text-white">
           <span className="material-symbols-outlined">arrow_back</span>
         </Link>
-        <h2 className="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-[#111318] dark:text-white">
-          AI 성분 진단 결과
-        </h2>
-        <div className="flex size-12 shrink-0 items-center justify-center" />
+        <h2 className="flex-1 text-center text-lg font-bold text-[#111318] dark:text-white">AI 성분 진단 결과</h2>
+        <div className="size-10" />
       </div>
 
-      <div className="flex flex-col gap-4 px-4 pt-2">
-        {result.recommendedProducts.map((p) => (
-          <Link
-            key={p.id}
-            to={`/ingredient/${p.id}`}
-            className="block rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:bg-zinc-800"
-          >
-            <div className="flex items-center gap-4">
-              {p.imageUrl ? (
-                <img src={p.imageUrl} alt={p.name} className="h-20 w-20 rounded-lg object-cover" />
-              ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <span className="material-symbols-outlined text-gray-300 text-3xl">image</span>
-                </div>
-              )}
-              <div className="flex flex-1 flex-col gap-1">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{p.brand}</p>
-                <p className="text-base font-bold text-gray-800 dark:text-white">{p.name}</p>
-                <div className="flex h-6 items-center gap-2 pt-1">
-                  <div className="relative h-2 w-full rounded-full bg-blue-100 dark:bg-blue-900/50">
-                    <div className="h-full rounded-full bg-primary" style={{ width: `${p.recommendScore}%` }} />
-                  </div>
-                  <p className="whitespace-nowrap text-sm font-bold text-primary">{p.recommendScore}% 추천</p>
-                </div>
-              </div>
-            </div>
-          </Link>
-        ))}
+      <div className="flex flex-col gap-4 p-4">
+        {/* 안전 점수 */}
+        <div className="flex flex-col items-center gap-2 rounded-xl bg-white dark:bg-gray-900/50 p-6">
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">종합 안전 점수</p>
+          <p className="text-5xl font-bold text-primary">{result.safetyScore}<span className="text-2xl">점</span></p>
+        </div>
 
-        {result.recommendedProducts.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <span className="material-symbols-outlined text-5xl mb-2">science</span>
-            <p className="text-sm">분석 결과가 없습니다.</p>
+        {/* 요약 */}
+        {result.summary && (
+          <div className="rounded-xl bg-white dark:bg-gray-900/50 p-4">
+            <h3 className="font-bold text-[#111318] dark:text-white mb-2">분석 요약</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{result.summary}</p>
+          </div>
+        )}
+
+        {/* 성분 분석 */}
+        {result.ingredientAnalysis.length > 0 && (
+          <div className="rounded-xl bg-white dark:bg-gray-900/50 p-4">
+            <h3 className="font-bold text-[#111318] dark:text-white mb-3">성분별 분석</h3>
+            <div className="flex flex-col gap-2">
+              {result.ingredientAnalysis.map((ing) => {
+                const style = SAFETY_STYLES[ing.safetyLevel]
+                return (
+                  <div key={ing.name} className={`rounded-lg p-3 bg-gray-50 dark:bg-gray-800 ${style.border}`}>
+                    <div className="flex items-center gap-2">
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full ${style.badge} text-xs font-bold text-white shrink-0`}>
+                        {ing.safetyLevel === 'warning' ? '!' : '✓'}
+                      </span>
+                      <span className="font-semibold text-[#111318] dark:text-white">{ing.name}</span>
+                    </div>
+                    <p className="mt-1 pl-7 text-sm text-gray-500 dark:text-gray-400">{ing.role}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 추천 사항 */}
+        {result.recommendations.length > 0 && (
+          <div className="rounded-xl bg-white dark:bg-gray-900/50 p-4">
+            <h3 className="font-bold text-[#111318] dark:text-white mb-3">추천 사항</h3>
+            <ul className="flex flex-col gap-2">
+              {result.recommendations.map((rec, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <span className="material-symbols-outlined text-primary text-base mt-0.5 shrink-0">lightbulb</span>
+                  <span>{rec}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>

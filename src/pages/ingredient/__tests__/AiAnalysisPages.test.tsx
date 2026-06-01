@@ -5,14 +5,10 @@ import AiAnalysisLoadingPage from '../AiAnalysisLoadingPage'
 import AiAnalysisResultPage from '../AiAnalysisResultPage'
 
 const mockResult = {
-  productId: 0,
-  safetyScore: 0,
-  ingredients: [],
-  summary: JSON.stringify({
-    recommendedProducts: [
-      { id: 1, brand: '디오디너리', name: '나이아신아마이드 10%', imageUrl: '', recommendScore: 95 },
-    ],
-  }),
+  safetyScore: 85,
+  ingredientAnalysis: [{ name: '레티놀', role: '안티에이징', safetyLevel: 'safe' as const }],
+  summary: '성분 분석 요약',
+  recommendations: ['추천 사항 1'],
 }
 
 describe('AiAnalysisLoadingPage', () => {
@@ -32,13 +28,29 @@ describe('AiAnalysisResultPage', () => {
     expect(screen.getByText('AI 성분 진단 결과')).toBeInTheDocument()
   })
 
-  it('추천 제품 이름을 렌더링한다', () => {
+  it('안전 점수를 렌더링한다', () => {
     render(<MemoryRouter><AiAnalysisResultPage /></MemoryRouter>)
-    expect(screen.getByText('나이아신아마이드 10%')).toBeInTheDocument()
+    expect(screen.getByText('85')).toBeInTheDocument()
   })
 
-  it('추천 점수를 렌더링한다', () => {
+  it('성분 이름을 렌더링한다', () => {
     render(<MemoryRouter><AiAnalysisResultPage /></MemoryRouter>)
-    expect(screen.getByText('95% 추천')).toBeInTheDocument()
+    expect(screen.getByText('레티놀')).toBeInTheDocument()
+  })
+
+  it('분석 요약을 렌더링한다', () => {
+    render(<MemoryRouter><AiAnalysisResultPage /></MemoryRouter>)
+    expect(screen.getByText('성분 분석 요약')).toBeInTheDocument()
+  })
+
+  it('추천 사항을 렌더링한다', () => {
+    render(<MemoryRouter><AiAnalysisResultPage /></MemoryRouter>)
+    expect(screen.getByText('추천 사항 1')).toBeInTheDocument()
+  })
+
+  it('결과가 없을 때 "분석 결과가 없습니다" 메시지를 렌더링한다', () => {
+    useAnalysisStore.setState({ ingredientResult: null, routineResult: null })
+    render(<MemoryRouter><AiAnalysisResultPage /></MemoryRouter>)
+    expect(screen.getByText('분석 결과가 없습니다.')).toBeInTheDocument()
   })
 })

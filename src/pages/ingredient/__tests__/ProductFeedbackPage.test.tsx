@@ -3,12 +3,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { vi } from 'vitest'
 import ProductFeedbackPage from '../ProductFeedbackPage'
-import * as ingredientApi from '../../../api/ingredient'
+import * as feedbackApi from '../../../api/feedback'
 
-vi.mock('../../../api/ingredient')
+vi.mock('../../../api/feedback')
 
 function renderFeedback(productId = '1') {
-  vi.mocked(ingredientApi.submitProductFeedback).mockResolvedValue({ data: {} } as any)
+  vi.mocked(feedbackApi.submitFeedback).mockResolvedValue({ data: {} } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={qc}>

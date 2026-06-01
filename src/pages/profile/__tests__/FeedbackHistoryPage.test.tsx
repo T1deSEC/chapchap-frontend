@@ -3,13 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import FeedbackHistoryPage from '../FeedbackHistoryPage'
-import * as profileApi from '../../../api/profile'
+import * as feedbackApi from '../../../api/feedback'
 
-vi.mock('../../../api/profile')
+vi.mock('../../../api/feedback')
 
 function renderFeedbackHistory() {
-  vi.mocked(profileApi.getFeedbackHistory).mockResolvedValue({ data: [
-    { id: 1, productId: 1, productName: '이니스프리 그린티 씨드 세럼', brand: '이니스프리', imageUrl: '', tags: ['피부 진정', '만족'], createdAt: '2024.07.15' },
+  vi.mocked(feedbackApi.getFeedbackHistory).mockResolvedValue({ data: [
+    { id: 1, productId: 1, productName: '이니스프리 그린티 씨드 세럼', brand: '이니스프리', imageUrl: '', reaction: 'good', isEffective: true, memo: '좋아요', createdAt: '2024.07.15' },
   ] } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(<QueryClientProvider client={qc}><MemoryRouter><FeedbackHistoryPage /></MemoryRouter></QueryClientProvider>)

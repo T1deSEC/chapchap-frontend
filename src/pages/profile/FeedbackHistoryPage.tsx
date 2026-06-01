@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useFeedbackHistory } from '../../hooks/useProfile'
+import { useFeedbackHistory } from '../../hooks/useFeedback'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 export default function FeedbackHistoryPage() {
@@ -42,15 +42,13 @@ export default function FeedbackHistoryPage() {
                   )}
                 </div>
               </div>
-              {record.tags.length > 0 && (
-                <div className="flex gap-2 p-4 pt-3 overflow-x-auto">
-                  {record.tags.map((tag) => (
-                    <div key={tag} className="flex h-8 shrink-0 items-center justify-center rounded-full bg-primary/10 px-3 dark:bg-primary/20">
-                      <p className="text-sm font-medium text-primary dark:text-primary/90">{tag}</p>
-                    </div>
-                  ))}
+              <div className="flex gap-2 p-4 pt-3">
+                <div className="flex h-8 shrink-0 items-center justify-center rounded-full bg-primary/10 px-3 dark:bg-primary/20">
+                  <p className="text-sm font-medium text-primary dark:text-primary/90">
+                    {record.reaction === 'good' ? '좋음' : record.reaction === 'neutral' ? '변화 없음' : '트러블 발생'}
+                  </p>
                 </div>
-              )}
+              </div>
             </div>
           ))
         )}

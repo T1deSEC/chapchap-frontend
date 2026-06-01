@@ -1,10 +1,21 @@
 import { useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { useSubmitFeedbackMutation } from '../../hooks/useIngredient'
+import { useSubmitFeedbackMutation } from '../../hooks/useFeedback'
 import Button from '../../components/ui/Button'
 
 const REACTIONS = ['좋음', '변화 없음', '트러블 발생'] as const
 type Reaction = typeof REACTIONS[number]
+
+export const mapReaction = (
+  reaction: '좋음' | '변화 없음' | '트러블 발생'
+): 'good' | 'neutral' | 'trouble' => {
+  const map = {
+    '좋음': 'good',
+    '변화 없음': 'neutral',
+    '트러블 발생': 'trouble',
+  } as const
+  return map[reaction]
+}
 
 const USAGE_PERIODS = ['1주일 미만', '1-2주', '2-4주', '1개월 이상']
 
@@ -18,11 +29,12 @@ export default function ProductFeedbackPage() {
   const [usagePeriod, setUsagePeriod] = useState('2-4주')
   const [comment, setComment] = useState('')
 
-  const { mutate, isPending } = useSubmitFeedbackMutation(Number(productId))
+  const { mutate, isPending } = useSubmitFeedbackMutation()
 
   const handleSubmit = () => {
+    const memo = [usagePeriod, `${rating}점`, comment].filter(Boolean).join(' / ')
     mutate(
-      { reaction, rating, usagePeriod, comment },
+      { productId: Number(productId), reaction: mapReaction(reaction), memo },
       { onSuccess: () => navigate(`/ingredient/${productId}`) }
     )
   }

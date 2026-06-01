@@ -1,10 +1,10 @@
 import { create } from 'zustand'
-import type { IngredientAnalysisResult, RoutineAnalysisResult } from '../types'
+import type { AiIngredientResult, RoutineAnalysisResult } from '../types'
 
 interface AnalysisStore {
-  ingredientResult: IngredientAnalysisResult | null
+  ingredientResult: AiIngredientResult | null
   routineResult: RoutineAnalysisResult | null
-  setIngredientResult: (result: IngredientAnalysisResult) => void
+  setIngredientResult: (result: AiIngredientResult) => void
   clearIngredientResult: () => void
   setRoutineResult: (result: RoutineAnalysisResult) => void
   clearRoutineResult: () => void

@@ -7,6 +7,7 @@ export interface User {
 
 export interface AuthResponse {
   accessToken: string
+  refreshToken: string
   user: User
 }
 
@@ -34,25 +35,6 @@ export interface Product {
   skinTypes: string[]
 }
 
-export interface IngredientAnalysisResult {
-  productId: number
-  safetyScore: number
-  ingredients: Array<{
-    name: string
-    role: string
-    safetyLevel: 'safe' | 'caution' | 'warning'
-  }>
-  summary: string
-}
-
-export interface RoutineAnalysisResult {
-  status: 'safe' | 'warning' | 'conflict'
-  conflictingIngredients: string[]
-  recommendation: string
-  suggestedProducts: Product[]
-}
-
-// 성분 탭 전용 타입
 export interface IngredientItem {
   name: string
   rank: number
@@ -73,23 +55,24 @@ export interface ProductDetail extends Product {
   skinImpacts: SkinImpact[]
 }
 
-export interface AiRecommendedProduct {
-  id: number
-  brand: string
-  name: string
-  imageUrl: string
-  recommendScore: number
-}
-
+// AI analysis — matches /api/analysis/ingredient response
 export interface AiIngredientResult {
-  recommendedProducts: AiRecommendedProduct[]
+  safetyScore: number
+  ingredientAnalysis: Array<{
+    name: string
+    role: string
+    safetyLevel: 'safe' | 'caution' | 'warning'
+  }>
+  summary: string
+  recommendations: string[]
 }
 
-export interface ProductFeedbackPayload {
-  reaction: '좋음' | '변화 없음' | '트러블 발생'
-  rating: number
-  usagePeriod: string
-  comment: string
+// AI routine — matches /api/analysis/routine response
+export interface RoutineAnalysisResult {
+  status: 'safe' | 'warning' | 'conflict'
+  conflictingPairs: Array<{ ingredient1: string; ingredient2: string }>
+  recommendation: string
+  suggestedAdjustments: string[]
 }
 
 export interface RoutineItem {
@@ -101,21 +84,21 @@ export interface RoutineItem {
   order: number
 }
 
-export interface RecommendedRoutine {
-  id: number
-  name: string
-  description: string
-  skinTypes: string[]
-}
-
 export interface UserProfile {
   id: number
   name: string
   email: string
   skinType: string
-  skinTone: string
   skinConcerns: string[]
-  avatarUrl?: string
+  gender?: string
+  birthYear?: number
+}
+
+export interface SkinProfilePayload {
+  skinType: string
+  skinConcerns: string[]
+  gender?: string
+  birthYear?: number
 }
 
 export interface WishlistItem {
@@ -124,7 +107,6 @@ export interface WishlistItem {
   productName: string
   brand: string
   imageUrl: string
-  tag?: string
 }
 
 export interface FeedbackRecord {
@@ -133,11 +115,24 @@ export interface FeedbackRecord {
   productName: string
   brand: string
   imageUrl: string
-  tags: string[]
+  reaction: 'good' | 'neutral' | 'trouble'
+  isEffective: boolean
+  memo: string
   createdAt: string
 }
 
-export interface SkinProfilePayload {
-  skinType: string
-  skinConcerns: string[]
+export interface ProductFeedbackPayload {
+  productId: number
+  reaction: 'good' | 'neutral' | 'trouble'
+  memo: string
+}
+
+export interface Notification {
+  id: number
+  icon: string
+  title: string
+  body: string
+  read: boolean
+  type: 'INGREDIENT_ANALYSIS' | 'ROUTINE_CONFLICT' | 'ROUTINE_CAUTION'
+  createdAt: string
 }

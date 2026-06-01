@@ -58,15 +58,21 @@ export default function AiRoutineResultPage() {
         <h2 className={`mb-8 text-2xl font-bold ${config.textColor}`}>{config.label}</h2>
 
         <div className="w-full rounded-2xl bg-white p-6 text-left shadow-sm dark:bg-gray-800">
-          {result.conflictingIngredients.length > 0 && (
+          {result.conflictingPairs.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-500">science</span>
-                <h3 className="font-bold text-gray-900 dark:text-gray-100">핵심 충돌 성분:</h3>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100">충돌 성분 쌍:</h3>
               </div>
-              <p className="mt-1 pl-8 text-gray-700 dark:text-gray-300">
-                {result.conflictingIngredients.join(', ')}
-              </p>
+              <ul className="mt-2 pl-8 flex flex-col gap-1">
+                {result.conflictingPairs.map((pair, i) => (
+                  <li key={i} className="text-gray-700 dark:text-gray-300 text-sm">
+                    <span className="font-medium">{pair.ingredient1}</span>
+                    <span className="mx-2 text-red-400">×</span>
+                    <span className="font-medium">{pair.ingredient2}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
@@ -80,40 +86,24 @@ export default function AiRoutineResultPage() {
             </div>
           )}
 
-          {result.suggestedProducts.length > 0 && (
+          {result.suggestedAdjustments.length > 0 && (
             <div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-500">auto_awesome</span>
-                <h3 className="font-bold text-gray-900 dark:text-gray-100">루틴 수정 추천 제품:</h3>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100">루틴 조정 추천:</h3>
               </div>
-              <div className="mt-4 space-y-4">
-                {result.suggestedProducts.map((product, idx) => (
-                  <div key={product.id}>
-                    <div className="flex items-center gap-4 rounded-lg bg-gray-100 p-3 dark:bg-gray-700">
-                      {product.imageUrl ? (
-                        <img src={product.imageUrl} alt={product.name} className="h-16 w-16 rounded-md object-cover" />
-                      ) : (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-md bg-white dark:bg-gray-600">
-                          <span className="material-symbols-outlined text-gray-300">image</span>
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-semibold text-gray-800 dark:text-gray-200">{product.brand}</p>
-                        <p className="text-gray-600 dark:text-gray-400">{product.name}</p>
-                      </div>
-                    </div>
-                    {idx < result.suggestedProducts.length - 1 && (
-                      <div className="flex justify-center">
-                        <span className="material-symbols-outlined text-3xl text-gray-400 dark:text-gray-500">arrow_downward</span>
-                      </div>
-                    )}
-                  </div>
+              <ul className="mt-2 pl-8 flex flex-col gap-2">
+                {result.suggestedAdjustments.map((adj, i) => (
+                  <li key={i} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                    <span className="material-symbols-outlined text-primary text-base shrink-0">arrow_right</span>
+                    <span>{adj}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
 
-          {result.status === 'safe' && result.conflictingIngredients.length === 0 && (
+          {result.status === 'safe' && result.conflictingPairs.length === 0 && (
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-green-500">check_circle</span>
               <p className="text-gray-700 dark:text-gray-300">{result.recommendation || '현재 루틴에 성분 충돌이 없습니다.'}</p>

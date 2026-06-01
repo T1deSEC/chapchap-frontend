@@ -14,7 +14,7 @@ describe('AiRoutineLoadingPage', () => {
 describe('AiRoutineResultPage', () => {
   it('safe 상태일 때 "안전" 헤딩을 렌더링한다', () => {
     useAnalysisStore.setState({
-      routineResult: { status: 'safe', conflictingIngredients: [], recommendation: '루틴이 안전합니다.', suggestedProducts: [] },
+      routineResult: { status: 'safe', conflictingPairs: [], recommendation: '루틴이 안전합니다.', suggestedAdjustments: [] },
       ingredientResult: null,
     })
     render(
@@ -27,9 +27,14 @@ describe('AiRoutineResultPage', () => {
     expect(screen.getByText('안전')).toBeInTheDocument()
   })
 
-  it('conflict 상태일 때 "경고" 헤딩과 충돌 성분을 렌더링한다', () => {
+  it('conflict 상태일 때 "경고" 헤딩과 충돌 성분 쌍을 렌더링한다', () => {
     useAnalysisStore.setState({
-      routineResult: { status: 'conflict', conflictingIngredients: ['비타민 C', '벤조일 퍼옥사이드'], recommendation: '서로 다른 시간대에 사용하세요', suggestedProducts: [] },
+      routineResult: {
+        status: 'conflict',
+        conflictingPairs: [{ ingredient1: '비타민 C', ingredient2: '벤조일 퍼옥사이드' }],
+        recommendation: '서로 다른 시간대에 사용하세요',
+        suggestedAdjustments: [],
+      },
       ingredientResult: null,
     })
     render(
@@ -40,13 +45,14 @@ describe('AiRoutineResultPage', () => {
       </MemoryRouter>
     )
     expect(screen.getByText('경고')).toBeInTheDocument()
-    expect(screen.getByText('비타민 C, 벤조일 퍼옥사이드')).toBeInTheDocument()
+    expect(screen.getByText('비타민 C')).toBeInTheDocument()
+    expect(screen.getByText('벤조일 퍼옥사이드')).toBeInTheDocument()
     expect(screen.getByText('서로 다른 시간대에 사용하세요')).toBeInTheDocument()
   })
 
   it('"확인" 버튼이 /routine으로 링크된다', () => {
     useAnalysisStore.setState({
-      routineResult: { status: 'safe', conflictingIngredients: [], recommendation: '', suggestedProducts: [] },
+      routineResult: { status: 'safe', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
       ingredientResult: null,
     })
     render(

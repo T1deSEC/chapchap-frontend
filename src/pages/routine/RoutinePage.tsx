@@ -17,7 +17,7 @@ export default function RoutinePage() {
 
   const { data: items = [], isLoading } = useRoutineItems(time)
   const { mutate: removeItem } = useRemoveRoutineItemMutation()
-  const { mutate: runAnalysis, isPending } = useAiRoutineAnalysisMutation()
+  const { mutate: runAnalysis, isPending } = useAiRoutineAnalysisMutation(items, time)
 
   const handleAiAnalysis = () => {
     runAnalysis(undefined, {

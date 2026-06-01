@@ -14,9 +14,9 @@ const mockItems = [
 
 function renderRoutine() {
   vi.mocked(routineApi.getRoutineItems).mockResolvedValue({ data: mockItems } as any)
-  vi.mocked(routineApi.removeRoutineItem).mockResolvedValue({ data: {} } as any)
+  vi.mocked(routineApi.removeRoutine).mockResolvedValue({ data: {} } as any)
   vi.mocked(routineApi.runAiRoutineAnalysis).mockResolvedValue({
-    data: { status: 'safe', conflictingIngredients: [], recommendation: '', suggestedProducts: [] },
+    data: { status: 'safe', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
   } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(

@@ -1,14 +1,15 @@
 import apiClient from './client'
-import type { UserProfile, WishlistItem, FeedbackRecord, SkinProfilePayload } from '../types'
+import type { UserProfile, SkinProfilePayload } from '../types'
 
 export const getProfile = () =>
-  apiClient.get<UserProfile>('/api/profile')
+  apiClient.get<UserProfile>('/api/users/me')
 
 export const updateSkinProfile = (payload: SkinProfilePayload) =>
-  apiClient.put<UserProfile>('/api/profile/skin', payload)
-
-export const getWishlist = () =>
-  apiClient.get<WishlistItem[]>('/api/profile/wishlist')
-
-export const getFeedbackHistory = () =>
-  apiClient.get<FeedbackRecord[]>('/api/profile/feedback-history')
+  Promise.all([
+    apiClient.put('/api/users/me/skin-profile', {
+      skinType: payload.skinType,
+      gender: payload.gender,
+      birthYear: payload.birthYear,
+    }),
+    apiClient.put('/api/users/me/skin-concerns', { concerns: payload.skinConcerns }),
+  ])

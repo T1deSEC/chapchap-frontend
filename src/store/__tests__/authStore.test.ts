@@ -1,40 +1,37 @@
-// src/store/__tests__/authStore.test.ts
-import { act } from 'react'
+import { renderHook, act } from '@testing-library/react'
 import { useAuthStore } from '../authStore'
 
-const mockUser = {
-  id: 1,
-  name: '홍길동',
-  email: 'test@test.com',
-  skinType: '복합성',
-}
-
 beforeEach(() => {
-  useAuthStore.setState({
-    accessToken: null,
-    user: null,
-    isAuthenticated: false,
+  useAuthStore.setState({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false })
+})
+
+describe('useAuthStore', () => {
+  it('login stores access token, refresh token, and user', () => {
+    const { result } = renderHook(() => useAuthStore())
+    act(() => {
+      result.current.login('access-123', 'refresh-456', { id: 1, name: '홍길동', email: 'test@test.com', skinType: '건성' })
+    })
+    expect(result.current.accessToken).toBe('access-123')
+    expect(result.current.refreshToken).toBe('refresh-456')
+    expect(result.current.isAuthenticated).toBe(true)
   })
-})
 
-it('초기 상태는 미인증이다', () => {
-  expect(useAuthStore.getState().isAuthenticated).toBe(false)
-  expect(useAuthStore.getState().accessToken).toBeNull()
-})
+  it('setTokens updates access and refresh tokens without changing user', () => {
+    const user = { id: 1, name: '홍길동', email: 'test@test.com', skinType: '건성' }
+    const { result } = renderHook(() => useAuthStore())
+    act(() => result.current.login('old-access', 'old-refresh', user))
+    act(() => result.current.setTokens('new-access', 'new-refresh'))
+    expect(result.current.accessToken).toBe('new-access')
+    expect(result.current.refreshToken).toBe('new-refresh')
+    expect(result.current.user).toEqual(user)
+  })
 
-it('login 호출 시 토큰과 유저가 저장된다', () => {
-  act(() => useAuthStore.getState().login('token-abc', mockUser))
-  const state = useAuthStore.getState()
-  expect(state.isAuthenticated).toBe(true)
-  expect(state.accessToken).toBe('token-abc')
-  expect(state.user?.name).toBe('홍길동')
-})
-
-it('logout 호출 시 상태가 초기화된다', () => {
-  act(() => useAuthStore.getState().login('token-abc', mockUser))
-  act(() => useAuthStore.getState().logout())
-  const state = useAuthStore.getState()
-  expect(state.isAuthenticated).toBe(false)
-  expect(state.accessToken).toBeNull()
-  expect(state.user).toBeNull()
+  it('logout clears all auth state', () => {
+    const { result } = renderHook(() => useAuthStore())
+    act(() => result.current.login('t', 'r', { id: 1, name: 'a', email: 'a@a.com', skinType: '건성' }))
+    act(() => result.current.logout())
+    expect(result.current.accessToken).toBeNull()
+    expect(result.current.refreshToken).toBeNull()
+    expect(result.current.isAuthenticated).toBe(false)
+  })
 })

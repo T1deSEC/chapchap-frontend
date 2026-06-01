@@ -4,9 +4,11 @@ import type { User } from '../types'
 
 interface AuthStore {
   accessToken: string | null
+  refreshToken: string | null
   user: User | null
   isAuthenticated: boolean
-  login: (token: string, user: User) => void
+  login: (accessToken: string, refreshToken: string, user: User) => void
+  setTokens: (accessToken: string, refreshToken: string) => void
   logout: () => void
 }
 
@@ -14,12 +16,15 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       accessToken: null,
+      refreshToken: null,
       user: null,
       isAuthenticated: false,
-      login: (accessToken, user) =>
-        set({ accessToken, user, isAuthenticated: true }),
+      login: (accessToken, refreshToken, user) =>
+        set({ accessToken, refreshToken, user, isAuthenticated: true }),
+      setTokens: (accessToken, refreshToken) =>
+        set({ accessToken, refreshToken }),
       logout: () =>
-        set({ accessToken: null, user: null, isAuthenticated: false }),
+        set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false }),
     }),
     { name: 'chapchap-auth' }
   )

@@ -1,6 +1,16 @@
-import { useParams, Link } from 'react-router-dom'
-import { useProductDetail } from '../../hooks/useIngredient'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useProductDetail, useAiIngredientAnalysisMutation } from '../../hooks/useIngredient'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import type { IngredientItem } from '../../types'
+
+export const computeSafetyScore = (ingredients: IngredientItem[]): number => {
+  if (ingredients.length === 0) return 100
+  const total = ingredients.reduce((sum, ing) => {
+    const score = ing.safetyLevel === 'safe' ? 100 : ing.safetyLevel === 'caution' ? 60 : 30
+    return sum + score
+  }, 0)
+  return Math.round(total / ingredients.length)
+}
 
 const SAFETY_BADGE_STYLES: Record<string, string> = {
   safe:    'bg-green-500',
@@ -23,6 +33,15 @@ const TEXT_COLORS: Record<string, string> = {
 export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>()
   const { data: product, isLoading } = useProductDetail(Number(productId))
+  const navigate = useNavigate()
+  const { mutate: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(Number(productId))
+
+  const handleAiAnalysis = () => {
+    runAnalysis(undefined, {
+      onSuccess: () => navigate('/ingredient/ai-result'),
+    })
+    navigate('/ingredient/ai-loading')
+  }
 
   if (isLoading) {
     return (
@@ -35,7 +54,8 @@ export default function ProductDetailPage() {
   if (!product) return null
 
   const circumference = 2 * Math.PI * 45
-  const offset = circumference - (circumference * product.safetyScore) / 100
+  const safetyScore = computeSafetyScore(product.ingredients ?? [])
+  const offset = circumference - (circumference * safetyScore) / 100
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
@@ -73,7 +93,7 @@ export default function ProductDetailPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-xs font-medium text-[#616f89] dark:text-gray-400">매치율</span>
-                <span className="text-3xl font-bold text-primary">{product.safetyScore}%</span>
+                <span className="text-3xl font-bold text-primary">{safetyScore}%</span>
               </div>
             </div>
           </div>
@@ -129,6 +149,15 @@ export default function ProductDetailPage() {
 
           <div className="mt-4 px-4 pb-4">
             <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={handleAiAnalysis}
+                disabled={isAnalyzing}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-lg font-bold text-white disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined">auto_awesome</span>
+                <span>AI 성분 진단</span>
+              </button>
               <button type="button" className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-primary py-2.5 text-lg font-bold text-primary">
                 <span className="material-symbols-outlined">add_task</span>
                 <span>루틴에 추가</span>

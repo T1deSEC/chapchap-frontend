@@ -1,22 +1,23 @@
 import apiClient from './client'
-import type { ProductDetail, AiIngredientResult, ProductFeedbackPayload } from '../types'
+import type { ProductDetail } from '../types'
 
-export interface SearchResult {
+export interface ProductSearchResult {
   id: number
   brand: string
   name: string
-  type: 'product' | 'ingredient'
-  description?: string
+  category: string
+  imageUrl: string
 }
 
-export const searchIngredients = (query: string, filter: string) =>
-  apiClient.get<SearchResult[]>('/api/ingredients/search', { params: { query, filter } })
+export const searchProducts = (query: string, category: string) =>
+  apiClient.get<ProductSearchResult[]>('/api/products', { params: { search: query, category } })
 
 export const getProductDetail = (productId: number) =>
   apiClient.get<ProductDetail>(`/api/products/${productId}`)
 
-export const runAiIngredientAnalysis = () =>
-  apiClient.post<AiIngredientResult>('/api/analysis/ingredient')
-
-export const submitProductFeedback = (productId: number, payload: ProductFeedbackPayload) =>
-  apiClient.post(`/api/products/${productId}/feedback`, payload)
+export const runAiIngredientAnalysis = (
+  productId: number,
+  userSkinType: string,
+  userSkinConcerns: string[]
+) =>
+  apiClient.post('/api/analysis/ingredient', { productId, userSkinType, userSkinConcerns })

@@ -1,18 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  searchIngredients,
-  getProductDetail,
-  runAiIngredientAnalysis,
-  submitProductFeedback,
-} from '../api/ingredient'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { searchProducts, getProductDetail, runAiIngredientAnalysis } from '../api/ingredient'
 import { useAnalysisStore } from '../store/analysisStore'
-import type { ProductFeedbackPayload } from '../types'
+import { useAuthStore } from '../store/authStore'
+import { useProfile } from './useProfile'
+import type { AiIngredientResult } from '../types'
 
-export const useIngredientSearch = (query: string, filter: string) =>
+export const useProductSearch = (query: string, category: string) =>
   useQuery({
-    queryKey: ['ingredients', 'search', query, filter],
-    queryFn: () => searchIngredients(query, filter).then((r) => r.data),
-    enabled: query.length > 0 || filter !== '전체',
+    queryKey: ['products', 'search', query, category],
+    queryFn: () => searchProducts(query, category).then((r) => r.data),
+    enabled: query.length > 0 || category !== '전체',
   })
 
 export const useProductDetail = (productId: number) =>
@@ -22,26 +19,18 @@ export const useProductDetail = (productId: number) =>
     enabled: productId > 0,
   })
 
-export const useAiIngredientAnalysisMutation = () => {
+export const useAiIngredientAnalysisMutation = (productId: number) => {
   const setIngredientResult = useAnalysisStore((s) => s.setIngredientResult)
-  return useMutation({
-    mutationFn: () => runAiIngredientAnalysis().then((r) => r.data),
-    onSuccess: (data) => {
-      setIngredientResult({
-        productId: 0,
-        safetyScore: 0,
-        ingredients: [],
-        summary: JSON.stringify(data),
-      })
-    },
-  })
-}
+  const user = useAuthStore((s) => s.user)
+  const { data: profile } = useProfile()
 
-export const useSubmitFeedbackMutation = (productId: number) => {
-  const qc = useQueryClient()
   return useMutation({
-    mutationFn: (payload: ProductFeedbackPayload) =>
-      submitProductFeedback(productId, payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['products', 'detail', productId] }),
+    mutationFn: () =>
+      runAiIngredientAnalysis(
+        productId,
+        user?.skinType ?? '',
+        profile?.skinConcerns ?? []
+      ).then((r) => r.data as AiIngredientResult),
+    onSuccess: (data) => setIngredientResult(data),
   })
 }

@@ -6,6 +6,12 @@ import ProductDetailPage from '../ProductDetailPage'
 import * as ingredientApi from '../../../api/ingredient'
 
 vi.mock('../../../api/ingredient')
+vi.mock('../../../hooks/useProfile', () => ({
+  useProfile: () => ({ data: { skinConcerns: [] } }),
+}))
+vi.mock('../../../store/authStore', () => ({
+  useAuthStore: (selector: (s: any) => any) => selector({ user: { skinType: '지성' } }),
+}))
 
 const mockDetail = {
   id: 1,
@@ -28,6 +34,7 @@ const mockDetail = {
 
 function renderDetail(id = '1') {
   vi.mocked(ingredientApi.getProductDetail).mockResolvedValue({ data: mockDetail } as any)
+  vi.mocked(ingredientApi.runAiIngredientAnalysis).mockResolvedValue({ data: {} } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={qc}>
@@ -35,6 +42,8 @@ function renderDetail(id = '1') {
         <Routes>
           <Route path="/ingredient/:productId" element={<ProductDetailPage />} />
           <Route path="/ingredient/:productId/feedback" element={<div>피드백</div>} />
+          <Route path="/ingredient/ai-loading" element={<div>AI로딩</div>} />
+          <Route path="/ingredient/ai-result" element={<div>AI결과</div>} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>
@@ -57,4 +66,10 @@ it('"피드백 제출" 링크가 올바른 경로를 가진다', async () => {
   renderDetail()
   await screen.findByText('하이드라부스트 모이스처라이저')
   expect(screen.getByText('피드백 제출').closest('a')).toHaveAttribute('href', '/ingredient/1/feedback')
+})
+
+it('"AI 성분 진단" 버튼을 렌더링한다', async () => {
+  renderDetail()
+  await screen.findByText('하이드라부스트 모이스처라이저')
+  expect(screen.getByText('AI 성분 진단')).toBeInTheDocument()
 })

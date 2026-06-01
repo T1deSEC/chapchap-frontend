@@ -1,23 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useIngredientSearch, useAiIngredientAnalysisMutation } from '../../hooks/useIngredient'
+import { Link } from 'react-router-dom'
+import { useProductSearch } from '../../hooks/useIngredient'
 
 const CATEGORIES = ['전체', '미백', '진정', '보습', '안티에이징', '여드름 케어', '자외선 차단']
 
 export default function IngredientPage() {
-  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('전체')
 
-  const { data: results = [] } = useIngredientSearch(query, filter)
-  const { mutate: runAnalysis, isPending } = useAiIngredientAnalysisMutation()
-
-  const handleAiAnalysis = () => {
-    runAnalysis(undefined, {
-      onSuccess: () => navigate('/ingredient/ai-result'),
-    })
-    navigate('/ingredient/ai-loading')
-  }
+  const { data: results = [] } = useProductSearch(query, filter)
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden pb-24">
@@ -27,18 +18,6 @@ export default function IngredientPage() {
           성분
         </h2>
         <div className="flex size-12 shrink-0 items-center justify-center" />
-      </div>
-
-      <div className="px-4 py-3">
-        <button
-          type="button"
-          onClick={handleAiAnalysis}
-          disabled={isPending}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-white disabled:opacity-50"
-        >
-          <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
-          <p className="text-base font-bold">AI 성분 진단</p>
-        </button>
       </div>
 
       <div className="px-4 py-3">
@@ -92,14 +71,9 @@ export default function IngredientPage() {
                   <p className="text-base font-bold leading-tight text-[#111318] dark:text-white">
                     {item.name}
                   </p>
-                  {item.description && (
-                    <p className="text-sm text-[#616f89] dark:text-gray-400">{item.description}</p>
-                  )}
                 </div>
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-                  <span className="material-symbols-outlined">
-                    {item.type === 'ingredient' ? 'science' : 'water_bottle'}
-                  </span>
+                  <span className="material-symbols-outlined">water_bottle</span>
                 </div>
               </Link>
             </div>

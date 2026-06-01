@@ -43,7 +43,7 @@ it('유효하지 않은 이메일 입력 시 에러 메시지를 표시한다', 
 it('로그인 성공 시 /home으로 이동하고 authStore가 업데이트된다', async () => {
   const mockUser = { id: 1, name: '홍길동', email: 'test@test.com', skinType: '복합성' }
   mockLogin.mockResolvedValueOnce({
-    data: { accessToken: 'token-xyz', user: mockUser },
+    data: { accessToken: 'token-xyz', refreshToken: 'refresh-xyz', user: mockUser },
   } as any)
 
   renderLogin()

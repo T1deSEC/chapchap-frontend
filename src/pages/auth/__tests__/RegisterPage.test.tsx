@@ -38,7 +38,7 @@ it('이름, 이메일, 비밀번호, 피부타입 선택 UI를 렌더링한다',
 it('회원가입 성공 시 /home으로 이동한다', async () => {
   const mockUser = { id: 2, name: '김철수', email: 'new@test.com', skinType: '건성' }
   mockRegister.mockResolvedValueOnce({
-    data: { accessToken: 'new-token', user: mockUser },
+    data: { accessToken: 'new-token', refreshToken: 'new-refresh', user: mockUser },
   } as any)
 
   renderRegister()

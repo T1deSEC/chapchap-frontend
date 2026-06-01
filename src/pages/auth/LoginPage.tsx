@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: FormData) => {
     const res = await login(data.email, data.password)
-    loginStore(res.data.accessToken, res.data.user)
+    loginStore(res.data.accessToken, res.data.refreshToken, res.data.user)
     navigate('/home')
   }
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => {
-            loginStore('dev-token', {
+            loginStore('dev-token', 'dev-refresh', {
               id: 1,
               name: '개발자',
               email: 'dev@chapchap.com',

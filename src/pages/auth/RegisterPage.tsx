@@ -37,7 +37,7 @@ export default function RegisterPage() {
       return
     }
     const res = await registerApi(data.name, data.email, data.password, skinType)
-    loginStore(res.data.accessToken, res.data.user)
+    loginStore(res.data.accessToken, res.data.refreshToken, res.data.user)
     navigate('/home')
   }
 

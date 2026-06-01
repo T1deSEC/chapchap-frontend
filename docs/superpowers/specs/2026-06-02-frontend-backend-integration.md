@@ -44,14 +44,15 @@ JWT AccessToken 만료(401) 시 자동으로 갱신한다.
 | `User` | 유지. 백엔드 `nickname` → `name`, `userId` → `id`로 매핑 |
 | `UserProfile` | `skinTone` 제거, `gender?: string`, `birthYear?: number` 추가 |
 | `SkinProfilePayload` | `gender?: string`, `birthYear?: number` 추가 |
-| `FeedbackRecord` | `tags: string[]` 제거 → `isEffective: boolean`, `memo: string` 추가 |
-| `ProductFeedbackPayload` | `{ reaction, rating, usagePeriod, comment }` → `{ productId: number, isEffective: boolean, memo: string }` |
+| `FeedbackRecord` | `tags: string[]` 제거 → `reaction: 'good' \| 'neutral' \| 'trouble'`, `isEffective: boolean`, `memo: string` 추가 |
+| `ProductFeedbackPayload` | `{ reaction, rating, usagePeriod, comment }` → `{ productId: number, reaction: 'good' \| 'neutral' \| 'trouble', memo: string }` |
+| `Notification` | `read: boolean`, `type: 'INGREDIENT_ANALYSIS' \| 'ROUTINE_CONFLICT' \| 'ROUTINE_CAUTION'` 추가 |
 | `RoutineItem` | 유지. 백엔드 period 매핑은 훅에서 처리 |
 | `AiIngredientResult` | `{ safetyScore: number, ingredientAnalysis: IngredientAnalysis[], summary: string, recommendations: string[] }` |
 | `ProductDetail.skinImpacts` | 현재 유지. 백엔드가 아직 반환하지 않으면 `[]` 폴백 (섹션 자동 미노출) |
 
 **피드백 폼 매핑 (UI는 변경 없음):**
-- `isEffective` = `reaction === '좋음'`
+- `reaction`: `'좋음' → 'good'`, `'변화 없음' → 'neutral'`, `'트러블 발생' → 'trouble'`
 - `memo` = `[usagePeriod, \`${rating}점\`, comment].filter(Boolean).join(' / ')`
 
 ---
@@ -89,7 +90,7 @@ JWT AccessToken 만료(401) 시 자동으로 갱신한다.
 
 ### 4-4. `src/api/feedback.ts` (신규)
 - `getFeedbackHistory()` — `GET /api/feedback`
-- `submitFeedback({ productId, isEffective, memo })` — `POST /api/feedback`
+- `submitFeedback({ productId, reaction, memo })` — `POST /api/feedback`
 
 ### 4-5. `src/api/ingredient.ts`
 | 함수 | 변경 |
@@ -126,6 +127,7 @@ JWT AccessToken 만료(401) 시 자동으로 갱신한다.
 | `useHome.ts` | `useUpdateDiaryMutation` 추가 |
 | `useWishlist.ts` | **신규** — `useWishlist`, `useAddToWishlistMutation`, `useRemoveFromWishlistMutation` |
 | `useFeedback.ts` | **신규** — `useFeedbackHistory`, `useSubmitFeedbackMutation` |
+| `useNotifications.ts` | **신규** — `useNotifications`, `useUnreadCount`, `useMarkAsReadMutation`, `useMarkAllAsReadMutation` |
 
 ---
 
@@ -136,10 +138,11 @@ JWT AccessToken 만료(401) 시 자동으로 갱신한다.
 | `LoginPage.tsx` | `loginStore(token, user)` → `loginStore(token, refreshToken, user)` |
 | `RegisterPage.tsx` | 동일 |
 | `ProductDetailPage.tsx` | `safetyScore` 클라이언트 계산: `ingredients` 배열의 safety_level 분포로 점수 산출 (safe=100, caution=60, warning=30 가중 평균). `skinImpacts`는 백엔드 미지원 시 `[]` 폴백 |
-| `ProductFeedbackPage.tsx` | `handleSubmit`에서 폼 데이터 → `{ isEffective, memo }` 매핑 추가 |
+| `ProductFeedbackPage.tsx` | `handleSubmit`에서 폼 데이터 → `{ reaction: 'good'\|'neutral'\|'trouble', memo }` 매핑 추가 |
 | `RoutinePage.tsx` | `time: morning/evening` UI 유지, 내부 API 호출 시 `AM/PM` 매핑 (훅에서 처리) |
 | `WishlistPage.tsx` | `useWishlist` 훅 교체 (profile → wishlist) |
 | `FeedbackHistoryPage.tsx` | `useFeedbackHistory` 훅 교체 (profile → feedback) |
+| `NotificationPage.tsx` | 실제 훅으로 교체, 읽음 처리 연동 |
 
 ---
 
@@ -170,9 +173,32 @@ color/level: score ≥ 60 → `primary`/`높음`, ≥ 30 → `warning`/`중간`,
 
 ---
 
-## 8. 범위 외 (현행 유지)
+## 8. 알림 API 연동 (신규 백엔드 구현 반영)
 
-- `src/api/notifications.ts` — 백엔드 스펙에 알림 API 없음. Mock 엔드포인트 유지.
+백엔드에 알림 API가 추가됨. 기존 mock `notifications.ts`를 실제 API로 교체한다.
+
+### API (`src/api/notifications.ts` 교체)
+- `getNotifications(page?, size?)` — `GET /api/notifications`
+- `getUnreadCount()` — `GET /api/notifications/unread-count` → `{ count: number }`
+- `markAsRead(id)` — `PUT /api/notifications/{id}/read`
+- `markAllAsRead()` — `PUT /api/notifications/read-all`
+
+### 알림 트리거 (백엔드 자동 생성)
+| 조건 | 타입 |
+|------|------|
+| `POST /api/analysis/ingredient` 성공 | `INGREDIENT_ANALYSIS` |
+| `POST /api/analysis/routine` → status `conflict` | `ROUTINE_CONFLICT` |
+| `POST /api/analysis/routine` → status `caution` | `ROUTINE_CAUTION` |
+
+### 훅 (`src/hooks/useNotifications.ts` 신규)
+- `useNotifications(page, size)` — 목록 조회
+- `useUnreadCount()` — 배지용 미읽음 수
+- `useMarkAsReadMutation()` — 단건 읽음
+- `useMarkAllAsReadMutation()` — 전체 읽음
+
+### 페이지
+- `NotificationPage.tsx` — 실제 훅으로 교체, 읽음 처리 버튼 연동
+- 상단 알림 아이콘 배지 — `useUnreadCount()` 연결 (현재 배지가 구현된 경우)
 
 ---
 
@@ -185,4 +211,4 @@ color/level: score ≥ 60 → `primary`/`높음`, ≥ 30 → `warning`/`중간`,
 5. `api/profile.ts`, 신규 `api/wishlist.ts`, `api/feedback.ts` — 프로필 도메인
 6. `api/ingredient.ts`, `api/routine.ts`, `api/products.ts`, `api/home.ts` — 나머지 도메인
 7. 훅 파일 전체 업데이트
-8. 페이지 변경 (LoginPage, RegisterPage, ProductDetailPage, ProductFeedbackPage, WishlistPage, FeedbackHistoryPage)
+8. 페이지 변경 (LoginPage, RegisterPage, ProductDetailPage, ProductFeedbackPage, WishlistPage, FeedbackHistoryPage, NotificationPage)

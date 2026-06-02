@@ -16,13 +16,28 @@ export interface ApiError {
   status: number
 }
 
+export interface PageResponse<T> {
+  content: T[]
+  page: {
+    totalElements: number
+    totalPages: number
+    size: number
+    number: number
+  }
+}
+
+// 백엔드 DiaryResponse와 동일한 구조
 export interface DiaryEntry {
   id: number
-  date: string
-  mood: 'great' | 'good' | 'neutral' | 'bad' | 'terrible'
+  logDate: string
+  skinStatus: string
   keywords: string[]
-  note: string
-  products: string[]
+  memo: string
+  photoUrl?: string
+  amRoutineId?: number
+  pmRoutineId?: number
+  amExecuted: boolean
+  pmExecuted: boolean
 }
 
 export interface Product {
@@ -31,15 +46,16 @@ export interface Product {
   brand: string
   category: string
   imageUrl: string
-  keyIngredients: string[]
-  skinTypes: string[]
 }
 
+// 백엔드 ProductIngredientResponse와 동일한 구조
 export interface IngredientItem {
-  name: string
-  rank: number
-  description: string
+  ingredientId: number
+  inciName: string
+  koName: string
+  functionTags: string[]
   safetyLevel: 'safe' | 'caution' | 'warning'
+  concentrationOrder: number
 }
 
 export interface SkinImpact {
@@ -49,39 +65,49 @@ export interface SkinImpact {
   color: 'primary' | 'warning' | 'danger'
 }
 
+// safetyScore는 ProductDetailPage에서 ingredients로 로컬 계산
 export interface ProductDetail extends Product {
-  safetyScore: number
   ingredients: IngredientItem[]
   skinImpacts: SkinImpact[]
 }
 
-// AI analysis — matches /api/analysis/ingredient response
+// 백엔드 IngredientAnalysisResponse와 동일한 구조
 export interface AiIngredientResult {
   safetyScore: number
   ingredientAnalysis: Array<{
-    name: string
-    role: string
+    inciName: string
+    koName: string
     safetyLevel: 'safe' | 'caution' | 'warning'
+    assessment: string
+    reason: string
   }>
   summary: string
   recommendations: string[]
 }
 
-// AI routine — matches /api/analysis/routine response
+// 백엔드 RoutineAnalysisResponse와 동일한 구조
 export interface RoutineAnalysisResult {
   status: 'safe' | 'warning' | 'conflict'
-  conflictingPairs: Array<{ ingredient1: string; ingredient2: string }>
+  conflictingPairs: Array<{ ingredient1: string; ingredient2: string; reason?: string }>
   recommendation: string
   suggestedAdjustments: string[]
 }
 
+// 백엔드 RoutineProductItem (productName/brand/imageUrl 포함)
 export interface RoutineItem {
-  id: number
   productId: number
+  stepOrder: number
   productName: string
   brand: string
   imageUrl: string
-  order: number
+}
+
+// 백엔드 RoutineResponse와 동일한 구조
+export interface RoutineRecord {
+  id: number
+  recordDate: string
+  routinePeriod: string
+  products: RoutineItem[]
 }
 
 export interface UserProfile {
@@ -101,24 +127,26 @@ export interface SkinProfilePayload {
   birthYear?: number
 }
 
+// 백엔드 WishlistItemResponse와 동일한 구조
 export interface WishlistItem {
-  id: number
   productId: number
   productName: string
   brand: string
+  category: string
   imageUrl: string
+  addedAt?: string
 }
 
 export type FeedbackReaction = 'good' | 'neutral' | 'trouble'
 
+// 백엔드 FeedbackResponse와 동일한 구조
 export interface FeedbackRecord {
-  id: number
   productId: number
   productName: string
-  brand: string
-  imageUrl: string
+  brand?: string
+  imageUrl?: string
+  effective: boolean
   reaction: FeedbackReaction
-  isEffective: boolean
   memo: string
   createdAt: string
 }
@@ -129,12 +157,44 @@ export interface ProductFeedbackPayload {
   memo: string
 }
 
+// 백엔드 NotificationResponse와 동일한 구조 (icon은 프론트에서 type으로 결정)
 export interface Notification {
   id: number
-  icon: string
+  type: 'INGREDIENT_ANALYSIS' | 'INGREDIENT_RECOMMENDATION' | 'ROUTINE_CONFLICT' | 'ROUTINE_CAUTION'
   title: string
   body: string
   read: boolean
-  type: 'INGREDIENT_ANALYSIS' | 'ROUTINE_CONFLICT' | 'ROUTINE_CAUTION'
   createdAt: string
+}
+
+export interface RecommendedIngredient {
+  ingredientId: number
+  inciName: string
+  koName: string
+  reason: string
+  sortOrder: number
+}
+
+export interface AvoidIngredient {
+  ingredientId: number
+  inciName: string
+  koName: string
+  reason: string
+}
+
+export interface RecommendedProduct {
+  productId: number
+  name: string
+  brand: string
+  imageUrl: string
+  matchScore: number
+  rankOrder: number
+}
+
+export interface IngredientRecommendation {
+  createdAt: string
+  summary: string
+  recommendedIngredients: RecommendedIngredient[]
+  ingredientsToAvoid: AvoidIngredient[]
+  recommendedProducts: RecommendedProduct[]
 }

@@ -4,11 +4,14 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { vi } from 'vitest'
 import IngredientPage from '../IngredientPage'
 import * as ingredientApi from '../../../api/ingredient'
+import * as recommendationApi from '../../../api/recommendation'
 
 vi.mock('../../../api/ingredient')
+vi.mock('../../../api/recommendation')
 
 function renderIngredient() {
-  vi.mocked(ingredientApi.searchProducts).mockResolvedValue({ data: [] } as any)
+  vi.mocked(ingredientApi.searchProducts).mockResolvedValue({ data: { content: [], page: { totalElements: 0 } } } as any)
+  vi.mocked(recommendationApi.getIngredientRecommendation).mockRejectedValue({ response: { status: 404 } })
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={qc}>
@@ -27,11 +30,9 @@ it('"성분" 헤더를 렌더링한다', () => {
   expect(screen.getByText('성분')).toBeInTheDocument()
 })
 
-it('카테고리 칩들을 렌더링한다', () => {
+it('AI 추천 섹션 제목을 렌더링한다', () => {
   renderIngredient()
-  expect(screen.getByText('전체')).toBeInTheDocument()
-  expect(screen.getByText('미백')).toBeInTheDocument()
-  expect(screen.getByText('보습')).toBeInTheDocument()
+  expect(screen.getByText('내 피부 맞춤 성분 추천')).toBeInTheDocument()
 })
 
 it('검색 인풋을 렌더링한다', () => {

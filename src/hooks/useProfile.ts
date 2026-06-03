@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getProfile, updateSkinProfile } from '../api/profile'
-import type { SkinProfilePayload } from '../types'
+import {
+  getProfile,
+  updateSkinProfile,
+  getNotificationSettings,
+  updateNotificationSettings,
+  updateNickname,
+  updatePassword,
+} from '../api/profile'
+import type { SkinProfilePayload, NotificationSettings } from '../types'
 
 export const useProfile = () =>
   useQuery({
@@ -15,3 +22,31 @@ export const useUpdateSkinProfileMutation = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['profile'] }),
   })
 }
+
+export const useNotificationSettings = () =>
+  useQuery({
+    queryKey: ['notification-settings'],
+    queryFn: () => getNotificationSettings().then((r) => r.data),
+  })
+
+export const useUpdateNotificationSettingsMutation = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: NotificationSettings) => updateNotificationSettings(payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['notification-settings'] }),
+  })
+}
+
+export const useUpdateNicknameMutation = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (nickname: string) => updateNickname(nickname),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['profile'] }),
+  })
+}
+
+export const useUpdatePasswordMutation = () =>
+  useMutation({
+    mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) =>
+      updatePassword(currentPassword, newPassword),
+  })

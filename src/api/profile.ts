@@ -1,5 +1,5 @@
 import apiClient from './client'
-import type { UserProfile, SkinProfilePayload } from '../types'
+import type { UserProfile, SkinProfilePayload, NotificationSettings } from '../types'
 
 export const getProfile = () =>
   apiClient.get<UserProfile>('/api/users/me')
@@ -13,3 +13,15 @@ export const updateSkinProfile = (payload: SkinProfilePayload) =>
     }),
     apiClient.put('/api/users/me/skin-concerns', { concerns: payload.skinConcerns }),
   ])
+
+export const getNotificationSettings = () =>
+  apiClient.get<NotificationSettings>('/api/users/me/notification-settings')
+
+export const updateNotificationSettings = (payload: NotificationSettings) =>
+  apiClient.put('/api/users/me/notification-settings', payload)
+
+export const updateNickname = (nickname: string) =>
+  apiClient.put('/api/users/me/nickname', { nickname })
+
+export const updatePassword = (currentPassword: string, newPassword: string) =>
+  apiClient.put('/api/users/me/password', { currentPassword, newPassword })

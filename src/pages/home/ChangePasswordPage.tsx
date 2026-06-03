@@ -13,6 +13,7 @@ export default function ChangePasswordPage() {
 
   const handleSave = () => {
     if (!currentPassword) { setError('현재 비밀번호를 입력해주세요.'); return }
+    if (!newPassword) { setError('새 비밀번호를 입력해주세요.'); return }
     if (newPassword.length < 8) { setError('새 비밀번호는 8자 이상이어야 합니다.'); return }
     if (newPassword !== confirmPassword) { setError('새 비밀번호가 일치하지 않습니다.'); return }
     setError('')

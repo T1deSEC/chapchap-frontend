@@ -8,6 +8,9 @@ import DiaryDetailPage from './pages/home/DiaryDetailPage'
 import RecommendPage from './pages/home/RecommendPage'
 import NotificationPage from './pages/home/NotificationPage'
 import SettingsPage from './pages/home/SettingsPage'
+import NotificationSettingsPage from './pages/home/NotificationSettingsPage'
+import ChangeNicknamePage from './pages/home/ChangeNicknamePage'
+import ChangePasswordPage from './pages/home/ChangePasswordPage'
 import IngredientPage from './pages/ingredient/IngredientPage'
 import AiAnalysisLoadingPage from './pages/ingredient/AiAnalysisLoadingPage'
 import AiAnalysisResultPage from './pages/ingredient/AiAnalysisResultPage'
@@ -38,6 +41,9 @@ export default function App() {
           <Route path="/home/recommend" element={<RecommendPage />} />
           <Route path="/home/notifications" element={<NotificationPage />} />
           <Route path="/home/settings" element={<SettingsPage />} />
+          <Route path="/home/settings/notifications" element={<NotificationSettingsPage />} />
+          <Route path="/home/settings/change-nickname" element={<ChangeNicknamePage />} />
+          <Route path="/home/settings/change-password" element={<ChangePasswordPage />} />
 
           {/* /ingredient/ai-loading을 /:productId보다 먼저 — static segment 우선 */}
           <Route path="/ingredient" element={<IngredientPage />} />

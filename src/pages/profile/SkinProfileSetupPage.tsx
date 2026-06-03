@@ -25,6 +25,9 @@ function SkinProfileSetupForm({ profile }: { profile: UserProfile | null }) {
 
   const handleSave = () => {
     const yearNum = birthYear ? parseInt(birthYear, 10) : undefined
+    if (yearNum !== undefined && (isNaN(yearNum) || yearNum < 1900 || yearNum > CURRENT_YEAR)) {
+      return
+    }
     mutate(
       { skinType, skinConcerns, gender: gender || undefined, birthYear: yearNum },
       { onSuccess: () => navigate('/profile') }

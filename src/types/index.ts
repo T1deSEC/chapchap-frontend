@@ -198,3 +198,9 @@ export interface IngredientRecommendation {
   ingredientsToAvoid: AvoidIngredient[]
   recommendedProducts: RecommendedProduct[]
 }
+
+export interface NotificationSettings {
+  ingredientAnalysisEnabled: boolean
+  ingredientRecommendEnabled: boolean
+  routineAnalysisEnabled: boolean
+}

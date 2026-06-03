@@ -10,6 +10,7 @@ interface AuthStore {
   login: (accessToken: string, refreshToken: string, user: User) => void
   setTokens: (accessToken: string, refreshToken: string) => void
   logout: () => void
+  updateUser: (updates: Partial<User>) => void
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -25,6 +26,8 @@ export const useAuthStore = create<AuthStore>()(
         set({ accessToken, refreshToken }),
       logout: () =>
         set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false }),
+      updateUser: (updates) =>
+        set((state) => ({ user: state.user ? { ...state.user, ...updates } : null })),
     }),
     { name: 'chapchap-auth' }
   )

@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getRoutineItems, saveRoutine, removeRoutine, runAiRoutineAnalysis } from '../api/routine'
+import { getRoutineItems, upsertRoutine, deleteRoutinePeriod, runAiRoutineAnalysis } from '../api/routine'
 import { useAnalysisStore } from '../store/analysisStore'
 import { useAuthStore } from '../store/authStore'
-import type { SaveRoutinePayload } from '../api/routine'
+import type { UpsertRoutinePayload } from '../api/routine'
+import type { RoutineRecord } from '../types'
 
 const toPeriod = (time: 'morning' | 'evening'): 'AM' | 'PM' =>
   time === 'morning' ? 'AM' : 'PM'
@@ -10,27 +11,33 @@ const toPeriod = (time: 'morning' | 'evening'): 'AM' | 'PM' =>
 export const useRoutineItems = (time: 'morning' | 'evening') =>
   useQuery({
     queryKey: ['routine', 'items', time],
-    queryFn: () => getRoutineItems(toPeriod(time)).then((r) => r.data),
+    queryFn: () =>
+      getRoutineItems(toPeriod(time))
+        .then((r) => r.data)
+        .catch((err) => {
+          if (err?.response?.status === 404) return null as unknown as RoutineRecord
+          throw err
+        }),
   })
 
-export const useSaveRoutineMutation = () => {
+export const useUpsertRoutineMutation = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (payload: SaveRoutinePayload) => saveRoutine(payload),
+    mutationFn: (payload: UpsertRoutinePayload) => upsertRoutine(payload).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['routine', 'items'] }),
   })
 }
 
-export const useRemoveRoutineItemMutation = () => {
+export const useDeleteRoutineMutation = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (routineId: number) => removeRoutine(routineId),
+    mutationFn: (period: 'AM' | 'PM') => deleteRoutinePeriod(period),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['routine', 'items'] }),
   })
 }
 
 export const useAiRoutineAnalysisMutation = (
-  items: Array<{ id: number; productId: number }>,
+  routine: RoutineRecord | null | undefined,
   time: 'morning' | 'evening'
 ) => {
   const setRoutineResult = useAnalysisStore((s) => s.setRoutineResult)
@@ -39,7 +46,7 @@ export const useAiRoutineAnalysisMutation = (
   return useMutation({
     mutationFn: () =>
       runAiRoutineAnalysis(
-        items.map((i) => i.productId),
+        (routine?.products ?? []).map((p) => p.productId),
         toPeriod(time),
         user?.skinType ?? ''
       ).then((r) => r.data),

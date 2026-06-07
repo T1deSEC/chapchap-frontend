@@ -1,19 +1,19 @@
 import apiClient from './client'
-import type { RoutineItem, RoutineAnalysisResult } from '../types'
+import type { RoutineRecord, RoutineAnalysisResult } from '../types'
 
-export interface SaveRoutinePayload {
-  period: 'AM' | 'PM'
-  products: Array<{ productId: number; order: number }>
+export interface UpsertRoutinePayload {
+  routinePeriod: 'AM' | 'PM'
+  products: Array<{ productId: number; stepOrder: number }>
 }
 
 export const getRoutineItems = (period: 'AM' | 'PM') =>
-  apiClient.get<RoutineItem[]>('/api/routine', { params: { period } })
+  apiClient.get<RoutineRecord>('/api/routine', { params: { period } })
 
-export const saveRoutine = (payload: SaveRoutinePayload) =>
-  apiClient.post('/api/routine', payload)
+export const upsertRoutine = (payload: UpsertRoutinePayload) =>
+  apiClient.put<RoutineRecord>('/api/routine', payload)
 
-export const removeRoutine = (routineId: number) =>
-  apiClient.delete(`/api/routine/${routineId}`)
+export const deleteRoutinePeriod = (period: 'AM' | 'PM') =>
+  apiClient.delete('/api/routine', { params: { period } })
 
 export const runAiRoutineAnalysis = (
   productIds: number[],

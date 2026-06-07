@@ -105,7 +105,7 @@ export default function RoutinePage() {
   const { mutate: upsert } = useUpsertRoutineMutation()
   const { mutate: deleteRoutine, isPending: isDeleting } = useDeleteRoutineMutation()
   const { mutate: runAnalysis, isPending: isAnalyzing } = useAiRoutineAnalysisMutation(
-    { ...routine, products: localProducts } as any,
+    routine != null ? { ...routine, products: localProducts } : null,
     time
   )
 

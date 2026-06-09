@@ -52,7 +52,6 @@ export interface IngredientItem {
   inciName: string
   koName: string
   functionTags: string[]
-  safetyLevel: 'safe' | 'caution' | 'warning'
   concentrationOrder: number
 }
 

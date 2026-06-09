@@ -1,5 +1,5 @@
 import apiClient from './client'
-import type { ProductDetail, PageResponse } from '../types'
+import type { ProductDetail, PageResponse, AiIngredientResult } from '../types'
 
 export interface ProductSearchResult {
   id: number
@@ -21,3 +21,6 @@ export const runAiIngredientAnalysis = (
   userSkinConcerns: string[]
 ) =>
   apiClient.post('/api/analysis/ingredient', { productId, userSkinType, userSkinConcerns })
+
+export const getProductAiAnalysis = (productId: number) =>
+  apiClient.get<AiIngredientResult>(`/api/analysis/ingredient/${productId}`)

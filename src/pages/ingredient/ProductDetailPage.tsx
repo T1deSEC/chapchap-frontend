@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useQueryClient } from '@tanstack/react-query'
-import { useProductDetail, useAiIngredientAnalysisMutation, useProductAiAnalysis } from '../../hooks/useIngredient'
+import { useProductDetail, useProductAiAnalysis } from '../../hooks/useIngredient'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
@@ -31,8 +30,6 @@ export default function ProductDetailPage() {
   const { data: product, isLoading: isProductLoading } = useProductDetail(id)
   const { data: analysis, isLoading: isAnalysisLoading } = useProductAiAnalysis(id)
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { mutateAsync: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(id)
 
   const analysisMap = useMemo(() => {
     if (!analysis) return new Map<string, (typeof analysis.ingredientAnalysis)[number]>()
@@ -40,13 +37,7 @@ export default function ProductDetailPage() {
   }, [analysis])
 
   const handleAiAnalysis = () => {
-    navigate('/ingredient/ai-loading')
-    runAnalysis()
-      .then((data) => {
-        queryClient.setQueryData(['productAiAnalysis', id], data)
-        navigate(`/ingredient/${productId}`)
-      })
-      .catch(() => navigate(`/ingredient/${productId}`))
+    navigate('/ingredient/ai-loading', { state: { productId: id } })
   }
 
   if (isProductLoading || isAnalysisLoading) {
@@ -198,7 +189,6 @@ export default function ProductDetailPage() {
               <button
                 type="button"
                 onClick={handleAiAnalysis}
-                disabled={isAnalyzing}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-lg font-bold text-white disabled:opacity-50"
               >
                 <span className="material-symbols-outlined">auto_awesome</span>

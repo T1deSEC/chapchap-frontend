@@ -1,4 +1,29 @@
+import { useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { useAiIngredientAnalysisMutation } from '../../hooks/useIngredient'
+
 export default function AiAnalysisLoadingPage() {
+  const { state } = useLocation()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const productId: number = state?.productId ?? 0
+  const { mutateAsync: runAnalysis } = useAiIngredientAnalysisMutation(productId)
+
+  useEffect(() => {
+    if (!productId) {
+      navigate('/ingredient', { replace: true })
+      return
+    }
+    runAnalysis()
+      .then((data) => {
+        queryClient.setQueryData(['productAiAnalysis', productId], data)
+        navigate(`/ingredient/${productId}`, { replace: true })
+      })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .catch(() => navigate(`/ingredient/${productId}`, { replace: true }))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-white dark:bg-zinc-900">
       <div className="flex flex-col items-center justify-center gap-6">

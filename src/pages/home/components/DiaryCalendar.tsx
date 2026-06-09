@@ -22,9 +22,9 @@ export default function DiaryCalendar({ year, month, entries, onMonthChange, onD
   const moodByDay: Record<number, string> = {}
   const entryByDay: Record<number, DiaryEntry> = {}
   entries.forEach((e) => {
-    const [y, m, d] = e.date.split('-').map(Number)
+    const [y, m, d] = e.logDate.split('-').map(Number)
     if (y === year && m === month) {
-      moodByDay[d] = e.mood
+      moodByDay[d] = e.skinStatus
       entryByDay[d] = e
     }
   })

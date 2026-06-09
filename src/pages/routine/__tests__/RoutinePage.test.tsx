@@ -19,9 +19,13 @@ const mockRoutine = {
   ],
 }
 
+// Spring Boot 3.3.4 PageImpl 직렬화 — 실제 응답은 page 중첩 객체가 아닌 평탄한 구조
 const mockPageResponse = {
   content: [{ id: 3, name: '테스트 크림', brand: 'COSRX', category: '보습', imageUrl: '' }],
-  page: { totalElements: 1, totalPages: 1, size: 20, number: 0 },
+  totalElements: 1,
+  totalPages: 1,
+  size: 20,
+  number: 0,
 }
 
 function renderRoutine() {
@@ -29,7 +33,7 @@ function renderRoutine() {
   vi.mocked(routineApi.upsertRoutine).mockResolvedValue({ data: mockRoutine } as any)
   vi.mocked(routineApi.deleteRoutinePeriod).mockResolvedValue({ data: {} } as any)
   vi.mocked(routineApi.runAiRoutineAnalysis).mockResolvedValue({
-    data: { status: 'safe', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
+    data: { status: 'good', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
   } as any)
   vi.mocked(productsApi.searchProducts).mockResolvedValue({ data: mockPageResponse } as any)
 
@@ -40,6 +44,7 @@ function renderRoutine() {
         <Routes>
           <Route path="/routine" element={<RoutinePage />} />
           <Route path="/routine/ai-loading" element={<div>AI로딩</div>} />
+          <Route path="/routine/ai-result" element={<div>AI결과</div>} />
           <Route path="/ingredient/:productId" element={<div>상세페이지</div>} />
         </Routes>
       </MemoryRouter>
@@ -82,6 +87,14 @@ it('AI 안전 진단 버튼 클릭 시 /routine/ai-loading으로 이동한다', 
   await screen.findByText('비타민 C 세럼')
   fireEvent.click(screen.getByText('AI 안전 진단'))
   expect(await screen.findByText('AI로딩')).toBeInTheDocument()
+})
+
+it('분석 완료 후 /routine/ai-result로 이동한다', async () => {
+  renderRoutine()
+  await screen.findByText('비타민 C 세럼')
+  fireEvent.click(screen.getByText('AI 안전 진단'))
+  await screen.findByText('AI로딩')
+  expect(await screen.findByText('AI결과')).toBeInTheDocument()
 })
 
 it('루틴이 없으면 빈 상태 메시지를 보여준다', async () => {

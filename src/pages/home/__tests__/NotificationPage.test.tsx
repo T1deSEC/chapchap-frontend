@@ -9,9 +9,12 @@ vi.mock('../../../api/notifications')
 
 function renderNotifications() {
   vi.mocked(notifApi.getNotifications).mockResolvedValue({
-    data: [
-      { id: 1, icon: 'warning', title: '피부 상태 주의!', body: '건조함이 감지되었어요.', read: false, type: 'ROUTINE_CONFLICT', createdAt: '2시간 전' },
-    ],
+    data: {
+      content: [
+        { id: 1, title: '피부 상태 주의!', body: '건조함이 감지되었어요.', read: false, type: 'ROUTINE_CONFLICT', createdAt: '2시간 전' },
+      ],
+      page: { totalElements: 1, totalPages: 1, size: 20, number: 0 },
+    },
   } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(

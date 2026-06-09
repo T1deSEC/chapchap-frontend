@@ -12,6 +12,8 @@ export const computeSafetyScore = (ingredients: IngredientItem[]): number => {
   return Math.round(total / ingredients.length)
 }
 
+const getIngredientDisplayName = (ing: IngredientItem) => ing.koName || ing.inciName
+
 const SAFETY_BADGE_STYLES: Record<string, string> = {
   safe:    'bg-green-500',
   caution: 'bg-yellow-400',
@@ -34,13 +36,13 @@ export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>()
   const { data: product, isLoading } = useProductDetail(Number(productId))
   const navigate = useNavigate()
-  const { mutate: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(Number(productId))
+  const { mutateAsync: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(Number(productId))
 
   const handleAiAnalysis = () => {
-    runAnalysis(undefined, {
-      onSuccess: () => navigate('/ingredient/ai-result'),
-    })
     navigate('/ingredient/ai-loading')
+    runAnalysis()
+      .then(() => navigate('/ingredient/ai-result'))
+      .catch(() => navigate(`/ingredient/${productId}`))
   }
 
   if (isLoading) {
@@ -103,16 +105,16 @@ export default function ProductDetailPage() {
             <div className="flex flex-col gap-2">
               {product.ingredients.map((ing) => (
                 <div
-                  key={ing.name}
+                  key={ing.inciName}
                   className={`rounded-lg p-3 ${ing.safetyLevel === 'warning' ? 'border-2 border-red-500 bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-gray-900/50'}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`flex size-5 items-center justify-center rounded-full ${SAFETY_BADGE_STYLES[ing.safetyLevel]} text-xs font-bold text-white`}>
-                        {ing.safetyLevel === 'warning' ? '!' : ing.rank}
+                        {ing.safetyLevel === 'warning' ? '!' : ing.concentrationOrder}
                       </span>
                       <span className={`font-semibold ${ing.safetyLevel === 'warning' ? 'text-red-500' : 'text-[#111318] dark:text-white'}`}>
-                        {ing.name}
+                        {getIngredientDisplayName(ing)}
                       </span>
                     </div>
                     {ing.safetyLevel === 'warning' && (
@@ -123,7 +125,7 @@ export default function ProductDetailPage() {
                     )}
                   </div>
                   <p className={`mt-1 pl-7 text-sm ${ing.safetyLevel === 'warning' ? 'text-red-500/80' : 'text-[#616f89] dark:text-gray-400'}`}>
-                    {ing.description}
+                    {(ing.functionTags ?? []).join(' · ')}
                   </p>
                 </div>
               ))}

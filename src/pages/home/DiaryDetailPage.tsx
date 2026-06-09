@@ -27,7 +27,7 @@ export default function DiaryDetailPage() {
 
   if (!entry) return null
 
-  const [y, m, d] = entry.date.split('-')
+  const [y, m, d] = entry.logDate.split('-')
 
   return (
     <div className="max-w-sm mx-auto min-h-screen flex flex-col bg-white dark:bg-background-dark">
@@ -48,7 +48,7 @@ export default function DiaryDetailPage() {
           <h3 className="text-gray-900 dark:text-gray-100 text-lg font-bold pb-3">이 날의 피부 상태</h3>
           <div className="flex justify-center items-center p-4">
             <div className="flex size-24 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md ring-2 ring-primary">
-              <span className="text-6xl">{MOOD_MAP[entry.mood] ?? '😐'}</span>
+              <span className="text-6xl">{MOOD_MAP[entry.skinStatus] ?? '😐'}</span>
             </div>
           </div>
         </section>
@@ -68,12 +68,12 @@ export default function DiaryDetailPage() {
         )}
 
         {/* 메모 */}
-        {entry.note && (
+        {entry.memo && (
           <section>
             <h3 className="text-gray-900 dark:text-gray-100 text-lg font-bold pb-3">메모</h3>
             <div className="w-full rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm">
               <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed">
-                {entry.note}
+                {entry.memo}
               </p>
             </div>
           </section>

@@ -3,7 +3,7 @@ import { computeSafetyScore } from '../ProductDetailPage'
 import type { IngredientItem } from '../../../types'
 
 const ing = (safetyLevel: 'safe' | 'caution' | 'warning'): IngredientItem =>
-  ({ name: 'x', rank: 1, description: '', safetyLevel })
+  ({ ingredientId: 1, inciName: 'x', koName: '', functionTags: [], safetyLevel, concentrationOrder: 1 })
 
 describe('computeSafetyScore', () => {
   it('returns 100 for empty ingredient list', () => {

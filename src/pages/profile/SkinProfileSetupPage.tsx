@@ -36,7 +36,7 @@ function SkinProfileSetupForm({ profile }: { profile: UserProfile | null }) {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-      <div className="flex-1 pb-32">
+      <div className="flex-1 pb-48">
         <div className="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-gray-200 dark:border-gray-800">
           <Link to="/profile" className="flex size-12 shrink-0 items-center justify-start -ml-2">
             <span className="material-symbols-outlined text-2xl text-gray-800 dark:text-gray-200">arrow_back_ios_new</span>
@@ -110,7 +110,7 @@ function SkinProfileSetupForm({ profile }: { profile: UserProfile | null }) {
           />
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4 pb-8">
+      <div className="fixed bottom-24 left-0 right-0 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4">
         <Button fullWidth onClick={handleSave} loading={isPending}>변경사항 저장하기</Button>
       </div>
     </div>

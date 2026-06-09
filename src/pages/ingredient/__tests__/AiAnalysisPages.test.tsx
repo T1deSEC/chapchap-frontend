@@ -6,7 +6,7 @@ import AiAnalysisResultPage from '../AiAnalysisResultPage'
 
 const mockResult = {
   safetyScore: 85,
-  ingredientAnalysis: [{ name: '레티놀', role: '안티에이징', safetyLevel: 'safe' as const }],
+  ingredientAnalysis: [{ inciName: 'Retinol', koName: '레티놀', assessment: '안티에이징', reason: '세포 재생 촉진', safetyLevel: 'safe' as const }],
   summary: '성분 분석 요약',
   recommendations: ['추천 사항 1'],
 }

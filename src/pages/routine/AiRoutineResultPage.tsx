@@ -2,25 +2,22 @@ import { Link } from 'react-router-dom'
 import { useAnalysisStore } from '../../store/analysisStore'
 
 const STATUS_CONFIG = {
-  safe: {
+  good: {
     label: '안전',
     icon: 'check_circle',
     bgColor: 'bg-green-500',
-    haloColor: 'bg-green-200 dark:bg-green-900/50',
     textColor: 'text-green-500 dark:text-green-400',
   },
-  warning: {
-    label: '주의',
-    icon: 'warning',
-    bgColor: 'bg-yellow-400',
-    haloColor: 'bg-yellow-200 dark:bg-yellow-900/50',
-    textColor: 'text-yellow-500 dark:text-yellow-400',
+  caution: {
+    label: '경고',
+    icon: 'priority_high',
+    bgColor: 'bg-red-500',
+    textColor: 'text-red-500 dark:text-red-400',
   },
   conflict: {
     label: '경고',
     icon: 'priority_high',
     bgColor: 'bg-red-500',
-    haloColor: 'bg-red-200 dark:bg-red-900/50',
     textColor: 'text-red-500 dark:text-red-400',
   },
 }
@@ -49,11 +46,8 @@ export default function AiRoutineResultPage() {
       </header>
 
       <main className="flex-grow flex flex-col items-center px-6 pt-12">
-        <div className="relative mb-4 flex h-24 w-24 items-center justify-center">
-          <div className={`absolute h-full w-full rounded-full ${config.haloColor} opacity-50`} />
-          <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-full ${config.bgColor}`}>
-            <span className="material-symbols-outlined text-5xl text-white">{config.icon}</span>
-          </div>
+        <div className={`mb-4 flex h-24 w-24 items-center justify-center rounded-full ${config.bgColor}`}>
+          <span className="material-symbols-outlined text-5xl text-white">{config.icon}</span>
         </div>
         <h2 className={`mb-8 text-2xl font-bold ${config.textColor}`}>{config.label}</h2>
 
@@ -100,13 +94,6 @@ export default function AiRoutineResultPage() {
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
-
-          {result.status === 'safe' && result.conflictingPairs.length === 0 && (
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-green-500">check_circle</span>
-              <p className="text-gray-700 dark:text-gray-300">{result.recommendation || '현재 루틴에 성분 충돌이 없습니다.'}</p>
             </div>
           )}
         </div>

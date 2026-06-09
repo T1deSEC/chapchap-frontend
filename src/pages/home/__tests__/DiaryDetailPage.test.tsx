@@ -9,11 +9,12 @@ vi.mock('../../../api/home')
 
 const mockEntry = {
   id: 5,
-  date: '2024-05-10',
-  mood: 'great',
+  logDate: '2024-05-10',
+  skinStatus: 'great',
   keywords: ['건조함', '홍조'],
-  note: '오늘 피부 좋았음',
-  products: [],
+  memo: '오늘 피부 좋았음',
+  amExecuted: false,
+  pmExecuted: false,
 }
 
 function renderDetail(id = '5') {

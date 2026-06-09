@@ -23,7 +23,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.name}
         </p>
         <p className="text-gray-500 dark:text-gray-400 text-[11px]">{product.brand}</p>
-        {product.keyIngredients.length > 0 && (
+        {(product.keyIngredients?.length ?? 0) > 0 && (
           <div>
             <p className="text-gray-400 dark:text-gray-500 text-[10px]">유사 성분</p>
             <p className="font-medium text-gray-700 dark:text-gray-300 text-[11px]">
@@ -32,7 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         <div className="flex items-center gap-1.5 flex-wrap mt-auto pt-1">
-          {product.skinTypes.map((type) => (
+          {(product.skinTypes ?? []).map((type) => (
             <span
               key={type}
               className="bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-200 px-2 py-0.5 rounded-full text-[10px] font-medium"

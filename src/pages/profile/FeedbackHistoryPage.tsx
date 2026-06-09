@@ -23,7 +23,7 @@ export default function FeedbackHistoryPage() {
           </div>
         ) : (
           records.map((record) => (
-            <div key={record.id}>
+            <div key={record.productId}>
               <div className="p-4 pb-0">
                 <div className="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-background-dark/50 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
                   <div className="flex flex-[2_2_0px] flex-col gap-4">

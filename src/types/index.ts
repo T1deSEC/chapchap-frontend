@@ -18,12 +18,10 @@ export interface ApiError {
 
 export interface PageResponse<T> {
   content: T[]
-  page: {
-    totalElements: number
-    totalPages: number
-    size: number
-    number: number
-  }
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
 }
 
 // 백엔드 DiaryResponse와 동일한 구조
@@ -87,7 +85,7 @@ export interface AiIngredientResult {
 
 // 백엔드 RoutineAnalysisResponse와 동일한 구조
 export interface RoutineAnalysisResult {
-  status: 'safe' | 'warning' | 'conflict'
+  status: 'good' | 'caution' | 'conflict'
   conflictingPairs: Array<{ ingredient1: string; ingredient2: string; reason?: string }>
   recommendation: string
   suggestedAdjustments: string[]

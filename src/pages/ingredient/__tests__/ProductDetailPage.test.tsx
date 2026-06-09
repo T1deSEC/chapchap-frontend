@@ -19,12 +19,9 @@ const mockDetail = {
   brand: '뷰티 브랜드',
   category: '모이스처라이저',
   imageUrl: '',
-  keyIngredients: ['히알루론산'],
-  skinTypes: ['건성'],
-  safetyScore: 85,
   ingredients: [
-    { name: '정제수', rank: 1, description: '베이스 성분', safetyLevel: 'safe' as const },
-    { name: '페녹시에탄올', rank: 2, description: '알러지 유발 가능', safetyLevel: 'warning' as const },
+    { ingredientId: 1, inciName: 'Aqua', koName: '정제수', functionTags: ['용제'], safetyLevel: 'safe' as const, concentrationOrder: 1 },
+    { ingredientId: 2, inciName: 'Phenoxyethanol', koName: '페녹시에탄올', functionTags: ['보존제'], safetyLevel: 'warning' as const, concentrationOrder: 2 },
   ],
   skinImpacts: [
     { label: '수분 공급', score: 90, level: '매우 높음', color: 'primary' as const },

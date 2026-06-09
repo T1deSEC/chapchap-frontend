@@ -51,15 +51,16 @@ export default function AiAnalysisResultPage() {
             <div className="flex flex-col gap-2">
               {result.ingredientAnalysis.map((ing) => {
                 const style = SAFETY_STYLES[ing.safetyLevel]
+                const displayName = ing.koName || ing.inciName
                 return (
-                  <div key={ing.name} className={`rounded-lg p-3 bg-gray-50 dark:bg-gray-800 ${style.border}`}>
+                  <div key={ing.inciName} className={`rounded-lg p-3 bg-gray-50 dark:bg-gray-800 ${style.border}`}>
                     <div className="flex items-center gap-2">
                       <span className={`flex h-5 w-5 items-center justify-center rounded-full ${style.badge} text-xs font-bold text-white shrink-0`}>
                         {ing.safetyLevel === 'warning' ? '!' : '✓'}
                       </span>
-                      <span className="font-semibold text-[#111318] dark:text-white">{ing.name}</span>
+                      <span className="font-semibold text-[#111318] dark:text-white">{displayName}</span>
                     </div>
-                    <p className="mt-1 pl-7 text-sm text-gray-500 dark:text-gray-400">{ing.role}</p>
+                    <p className="mt-1 pl-7 text-sm text-gray-500 dark:text-gray-400">{ing.assessment}</p>
                   </div>
                 )
               })}

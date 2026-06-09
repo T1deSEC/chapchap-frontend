@@ -1,16 +1,16 @@
 import apiClient from './client'
-import type { ProductDetail } from '../types'
+import type { ProductDetail, PageResponse } from '../types'
 
 export interface ProductSearchResult {
   id: number
-  brand: string
   name: string
+  brand: string
   category: string
   imageUrl: string
 }
 
 export const searchProducts = (query: string, category: string) =>
-  apiClient.get<ProductSearchResult[]>('/api/products', { params: { search: query, category } })
+  apiClient.get<PageResponse<ProductSearchResult>>('/api/products', { params: { search: query, category } })
 
 export const getProductDetail = (productId: number) =>
   apiClient.get<ProductDetail>(`/api/products/${productId}`)

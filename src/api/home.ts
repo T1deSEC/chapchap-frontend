@@ -1,7 +1,18 @@
 import apiClient from './client'
 import type { DiaryEntry } from '../types'
 
-export type CreateDiaryPayload = Pick<DiaryEntry, 'mood' | 'keywords' | 'note' | 'date'>
+export interface CreateDiaryPayload {
+  logDate: string
+  skinStatus: string
+  keywords?: string[]
+  memo?: string
+  photoUrl?: string
+  amRoutineId?: number
+  pmRoutineId?: number
+  amExecuted?: boolean
+  pmExecuted?: boolean
+}
+
 export type UpdateDiaryPayload = Partial<CreateDiaryPayload>
 
 export const getDiaryEntries = (year: number, month: number) =>

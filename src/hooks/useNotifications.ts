@@ -9,13 +9,13 @@ import {
 export const useNotifications = (page = 0, size = 20) =>
   useQuery({
     queryKey: ['notifications', page, size],
-    queryFn: () => getNotifications(page, size).then((r) => r.data),
+    queryFn: () => getNotifications(page, size).then((r) => r.data.content),
   })
 
 export const useUnreadCount = () =>
   useQuery({
     queryKey: ['notifications', 'unread-count'],
-    queryFn: () => getUnreadCount().then((r) => r.data.count),
+    queryFn: () => getUnreadCount().then((r) => r.data),
   })
 
 export const useMarkAsReadMutation = () => {

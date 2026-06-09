@@ -24,7 +24,7 @@ export default function WishlistPage() {
         ) : (
           <div className="flex flex-col gap-4">
             {items.map((item) => (
-              <div key={item.id} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/50">
+              <div key={item.productId} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/50">
                 <div className="flex items-start gap-4">
                   {item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.productName} className="h-24 w-24 shrink-0 rounded-lg object-cover" />

@@ -8,7 +8,7 @@ import type { AiIngredientResult } from '../types'
 export const useProductSearch = (query: string, category: string) =>
   useQuery({
     queryKey: ['products', 'search', query, category],
-    queryFn: () => searchProducts(query, category).then((r) => r.data),
+    queryFn: () => searchProducts(query, category).then((r) => r.data.content),
     enabled: query.length > 0 || category !== '전체',
   })
 

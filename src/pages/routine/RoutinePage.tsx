@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   DndContext,
@@ -100,19 +100,27 @@ export default function RoutinePage() {
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [localProducts, setLocalProducts] = useState<RoutineItem[]>([])
+  const loadedPeriodRef = useRef<'AM' | 'PM' | null>(null)
 
   const { data: routine, isLoading } = useRoutineItems(time)
   const { mutate: upsert } = useUpsertRoutineMutation()
   const { mutate: deleteRoutine, isPending: isDeleting } = useDeleteRoutineMutation()
-  const { mutate: runAnalysis, isPending: isAnalyzing } = useAiRoutineAnalysisMutation(
+  const { mutateAsync: runAnalysis, isPending: isAnalyzing } = useAiRoutineAnalysisMutation(
     routine != null ? { ...routine, products: localProducts } : null,
     time
   )
 
-  // 서버 데이터와 로컬 상태 동기화
+  // 탭(period)을 새로 불러왔을 때만 서버 데이터로 동기화한다.
+  // 편집 중에는 upsert invalidate로 인한 백그라운드 refetch가 로컬 편집을 덮어쓰지 않도록
+  // (PUT이 커밋되기 전에 도착한 stale GET이 방금 한 편집을 되돌리는 경쟁 상태 방지) localProducts를 그대로 둔다.
   useEffect(() => {
-    setLocalProducts(routine?.products ?? [])
-  }, [routine])
+    if (isLoading) return
+    const period = toPeriod(time)
+    if (loadedPeriodRef.current !== period) {
+      setLocalProducts(routine?.products ?? [])
+      loadedPeriodRef.current = period
+    }
+  }, [time, routine, isLoading])
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -152,15 +160,18 @@ export default function RoutinePage() {
 
   const handleReset = () => {
     deleteRoutine(toPeriod(time), {
-      onSuccess: () => setShowResetConfirm(false),
+      onSuccess: () => {
+        setLocalProducts([])
+        setShowResetConfirm(false)
+      },
     })
   }
 
   const handleAiAnalysis = () => {
-    runAnalysis(undefined, {
-      onSuccess: () => navigate('/routine/ai-result'),
-    })
     navigate('/routine/ai-loading')
+    runAnalysis()
+      .then(() => navigate('/routine/ai-result'))
+      .catch(() => navigate('/routine'))
   }
 
   const existingIds = new Set(localProducts.map((p) => p.productId))

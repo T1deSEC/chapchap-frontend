@@ -3,8 +3,8 @@ import DiaryCalendar from '../DiaryCalendar'
 import type { DiaryEntry } from '../../../../types'
 
 const mockEntries: DiaryEntry[] = [
-  { id: 1, date: '2024-05-10', mood: 'great', keywords: [], note: '', products: [] },
-  { id: 2, date: '2024-05-15', mood: 'bad',   keywords: [], note: '', products: [] },
+  { id: 1, logDate: '2024-05-10', skinStatus: 'great', keywords: [], memo: '', amExecuted: false, pmExecuted: false },
+  { id: 2, logDate: '2024-05-15', skinStatus: 'bad',   keywords: [], memo: '', amExecuted: false, pmExecuted: false },
 ]
 
 it('요일 헤더(일~토)를 렌더링한다', () => {

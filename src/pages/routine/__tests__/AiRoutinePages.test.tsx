@@ -12,9 +12,9 @@ describe('AiRoutineLoadingPage', () => {
 })
 
 describe('AiRoutineResultPage', () => {
-  it('safe 상태일 때 "안전" 헤딩을 렌더링한다', () => {
+  it('good 상태일 때 "안전" 헤딩을 렌더링한다', () => {
     useAnalysisStore.setState({
-      routineResult: { status: 'safe', conflictingPairs: [], recommendation: '루틴이 안전합니다.', suggestedAdjustments: [] },
+      routineResult: { status: 'good', conflictingPairs: [], recommendation: '루틴이 안전합니다.', suggestedAdjustments: [] },
       ingredientResult: null,
     })
     render(
@@ -52,7 +52,7 @@ describe('AiRoutineResultPage', () => {
 
   it('"확인" 버튼이 /routine으로 링크된다', () => {
     useAnalysisStore.setState({
-      routineResult: { status: 'safe', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
+      routineResult: { status: 'good', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
       ingredientResult: null,
     })
     render(

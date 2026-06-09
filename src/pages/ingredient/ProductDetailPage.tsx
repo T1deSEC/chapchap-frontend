@@ -1,20 +1,12 @@
+import { useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useProductDetail, useAiIngredientAnalysisMutation } from '../../hooks/useIngredient'
+import { useProductDetail, useAiIngredientAnalysisMutation, useProductAiAnalysis } from '../../hooks/useIngredient'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
-import type { IngredientItem } from '../../types'
 
-export const computeSafetyScore = (ingredients: IngredientItem[]): number => {
-  if (ingredients.length === 0) return 100
-  const total = ingredients.reduce((sum, ing) => {
-    const score = ing.safetyLevel === 'safe' ? 100 : ing.safetyLevel === 'caution' ? 60 : 30
-    return sum + score
-  }, 0)
-  return Math.round(total / ingredients.length)
-}
+const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
+  ing.koName || ing.inciName
 
-const getIngredientDisplayName = (ing: IngredientItem) => ing.koName || ing.inciName
-
-const SAFETY_BADGE_STYLES: Record<string, string> = {
+const SAFETY_BADGE: Record<string, string> = {
   safe:    'bg-green-500',
   caution: 'bg-yellow-400',
   warning: 'bg-red-500',
@@ -34,9 +26,16 @@ const TEXT_COLORS: Record<string, string> = {
 
 export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>()
-  const { data: product, isLoading } = useProductDetail(Number(productId))
+  const id = Number(productId)
+  const { data: product, isLoading: isProductLoading } = useProductDetail(id)
+  const { data: analysis, isLoading: isAnalysisLoading } = useProductAiAnalysis(id)
   const navigate = useNavigate()
-  const { mutateAsync: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(Number(productId))
+  const { mutateAsync: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(id)
+
+  const analysisMap = useMemo(() => {
+    if (!analysis) return new Map<string, (typeof analysis.ingredientAnalysis)[number]>()
+    return new Map(analysis.ingredientAnalysis.map((ing) => [ing.inciName, ing]))
+  }, [analysis])
 
   const handleAiAnalysis = () => {
     navigate('/ingredient/ai-loading')
@@ -45,7 +44,7 @@ export default function ProductDetailPage() {
       .catch(() => navigate(`/ingredient/${productId}`))
   }
 
-  if (isLoading) {
+  if (isProductLoading || isAnalysisLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <LoadingSpinner />
@@ -56,8 +55,6 @@ export default function ProductDetailPage() {
   if (!product) return null
 
   const circumference = 2 * Math.PI * 45
-  const safetyScore = computeSafetyScore(product.ingredients ?? [])
-  const offset = circumference - (circumference * safetyScore) / 100
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
@@ -81,54 +78,71 @@ export default function ProductDetailPage() {
               <p className="text-sm text-[#616f89] dark:text-gray-400">{product.brand}</p>
               <h2 className="mt-1 text-xl font-bold text-[#111318] dark:text-white">{product.name}</h2>
             </div>
-            <div className="relative size-32">
-              <svg className="size-full" viewBox="0 0 100 100">
-                <circle className="stroke-current text-gray-200 dark:text-gray-700" cx="50" cy="50" r="45" fill="transparent" strokeWidth="10" />
-                <circle
-                  className="stroke-current text-primary"
-                  cx="50" cy="50" r="45" fill="transparent" strokeWidth="10"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
-                  style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xs font-medium text-[#616f89] dark:text-gray-400">매치율</span>
-                <span className="text-3xl font-bold text-primary">{safetyScore}%</span>
+
+            {analysis ? (
+              <div className="relative size-32">
+                <svg className="size-full" viewBox="0 0 100 100">
+                  <circle className="stroke-current text-gray-200 dark:text-gray-700" cx="50" cy="50" r="45" fill="transparent" strokeWidth="10" />
+                  <circle
+                    className="stroke-current text-primary"
+                    cx="50" cy="50" r="45" fill="transparent" strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={circumference - (circumference * analysis.safetyScore) / 100}
+                    style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-xs font-medium text-[#616f89] dark:text-gray-400">안전 점수</span>
+                  <span className="text-3xl font-bold text-primary">{analysis.safetyScore}</span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex size-32 items-center justify-center rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600">
+                <div className="flex flex-col items-center gap-1">
+                  <span className="material-symbols-outlined text-gray-400">help_outline</span>
+                  <span className="text-center text-xs text-gray-400 dark:text-gray-500">분석 전</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-4 flex flex-col gap-4 p-4">
             <h3 className="text-lg font-bold text-[#111318] dark:text-white">전 성분 리스트</h3>
             <div className="flex flex-col gap-2">
-              {product.ingredients.map((ing) => (
-                <div
-                  key={ing.inciName}
-                  className={`rounded-lg p-3 ${ing.safetyLevel === 'warning' ? 'border-2 border-red-500 bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-gray-900/50'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className={`flex size-5 items-center justify-center rounded-full ${SAFETY_BADGE_STYLES[ing.safetyLevel]} text-xs font-bold text-white`}>
-                        {ing.safetyLevel === 'warning' ? '!' : ing.concentrationOrder}
-                      </span>
-                      <span className={`font-semibold ${ing.safetyLevel === 'warning' ? 'text-red-500' : 'text-[#111318] dark:text-white'}`}>
-                        {getIngredientDisplayName(ing)}
-                      </span>
-                    </div>
-                    {ing.safetyLevel === 'warning' && (
-                      <div className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5">
-                        <span className="material-symbols-outlined text-sm text-red-500">error</span>
-                        <span className="text-xs font-bold text-red-500">충돌</span>
+              {product.ingredients.map((ing) => {
+                const aiIng = analysisMap.get(ing.inciName)
+                const safetyLevel = aiIng?.safetyLevel
+                return (
+                  <div
+                    key={ing.inciName}
+                    className={`rounded-lg p-3 ${safetyLevel === 'warning' ? 'border-2 border-red-500 bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-gray-900/50'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`flex size-5 items-center justify-center rounded-full text-xs font-bold text-white ${safetyLevel ? SAFETY_BADGE[safetyLevel] : 'bg-primary'}`}>
+                          {safetyLevel === 'warning' ? '!' : ing.concentrationOrder}
+                        </span>
+                        <span className={`font-semibold ${safetyLevel === 'warning' ? 'text-red-500' : 'text-[#111318] dark:text-white'}`}>
+                          {getIngredientDisplayName(ing)}
+                        </span>
                       </div>
+                      {safetyLevel === 'warning' && (
+                        <div className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5">
+                          <span className="material-symbols-outlined text-sm text-red-500">error</span>
+                          <span className="text-xs font-bold text-red-500">충돌</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className={`mt-1 pl-7 text-sm ${safetyLevel === 'warning' ? 'text-red-500/80' : 'text-[#616f89] dark:text-gray-400'}`}>
+                      {(ing.functionTags ?? []).join(' · ')}
+                    </p>
+                    {aiIng?.assessment && (
+                      <p className="mt-1 pl-7 text-xs text-[#616f89] dark:text-gray-500">{aiIng.assessment}</p>
                     )}
                   </div>
-                  <p className={`mt-1 pl-7 text-sm ${ing.safetyLevel === 'warning' ? 'text-red-500/80' : 'text-[#616f89] dark:text-gray-400'}`}>
-                    {(ing.functionTags ?? []).join(' · ')}
-                  </p>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
@@ -158,7 +172,7 @@ export default function ProductDetailPage() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-lg font-bold text-white disabled:opacity-50"
               >
                 <span className="material-symbols-outlined">auto_awesome</span>
-                <span>AI 성분 진단</span>
+                <span>{analysis ? 'AI 성분 재진단' : 'AI 성분 진단'}</span>
               </button>
               <button type="button" className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-primary py-2.5 text-lg font-bold text-primary">
                 <span className="material-symbols-outlined">add_task</span>

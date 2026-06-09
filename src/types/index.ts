@@ -74,7 +74,7 @@ export interface AiIngredientResult {
   ingredientAnalysis: Array<{
     inciName: string
     koName: string
-    safetyLevel: 'safe' | 'caution' | 'warning'
+    safetyLevel: '안전' | '주의' | '위험'
     assessment: string
     reason: string
   }>

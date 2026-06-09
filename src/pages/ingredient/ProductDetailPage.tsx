@@ -7,9 +7,9 @@ const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
   ing.koName || ing.inciName
 
 const SAFETY_BADGE: Record<string, string> = {
-  safe:    'bg-green-500',
-  caution: 'bg-yellow-400',
-  warning: 'bg-red-500',
+  '안전': 'bg-green-500',
+  '주의': 'bg-yellow-400',
+  '위험': 'bg-red-500',
 }
 
 const BAR_COLORS: Record<string, string> = {
@@ -116,25 +116,25 @@ export default function ProductDetailPage() {
                 return (
                   <div
                     key={ing.inciName}
-                    className={`rounded-lg p-3 ${safetyLevel === 'warning' ? 'border-2 border-red-500 bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-gray-900/50'}`}
+                    className={`rounded-lg p-3 ${safetyLevel === '위험' ? 'border-2 border-red-500 bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-gray-900/50'}`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className={`flex size-5 items-center justify-center rounded-full text-xs font-bold text-white ${safetyLevel ? SAFETY_BADGE[safetyLevel] : 'bg-primary'}`}>
-                          {safetyLevel === 'warning' ? '!' : ing.concentrationOrder}
+                          {safetyLevel === '위험' ? '!' : ing.concentrationOrder}
                         </span>
-                        <span className={`font-semibold ${safetyLevel === 'warning' ? 'text-red-500' : 'text-[#111318] dark:text-white'}`}>
+                        <span className={`font-semibold ${safetyLevel === '위험' ? 'text-red-500' : 'text-[#111318] dark:text-white'}`}>
                           {getIngredientDisplayName(ing)}
                         </span>
                       </div>
-                      {safetyLevel === 'warning' && (
+                      {safetyLevel === '위험' && (
                         <div className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5">
                           <span className="material-symbols-outlined text-sm text-red-500">error</span>
                           <span className="text-xs font-bold text-red-500">충돌</span>
                         </div>
                       )}
                     </div>
-                    <p className={`mt-1 pl-7 text-sm ${safetyLevel === 'warning' ? 'text-red-500/80' : 'text-[#616f89] dark:text-gray-400'}`}>
+                    <p className={`mt-1 pl-7 text-sm ${safetyLevel === '위험' ? 'text-red-500/80' : 'text-[#616f89] dark:text-gray-400'}`}>
                       {(ing.functionTags ?? []).join(' · ')}
                     </p>
                     {aiIng?.assessment && (

@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useAnalysisStore } from '../../store/analysisStore'
 
-const SAFETY_STYLES = {
-  safe:    { badge: 'bg-green-500', text: '안전', border: '' },
-  caution: { badge: 'bg-yellow-400', text: '주의', border: 'border border-yellow-400' },
-  warning: { badge: 'bg-red-500',   text: '위험', border: 'border-2 border-red-500' },
+const SAFETY_STYLES: Record<string, { badge: string; text: string; border: string }> = {
+  '안전': { badge: 'bg-green-500',   text: '안전', border: '' },
+  '주의': { badge: 'bg-yellow-400',  text: '주의', border: 'border border-yellow-400' },
+  '위험': { badge: 'bg-red-500',     text: '위험', border: 'border-2 border-red-500' },
 }
+const DEFAULT_STYLE = { badge: 'bg-gray-400', text: '미분류', border: '' }
 
 export default function AiAnalysisResultPage() {
   const result = useAnalysisStore((s) => s.ingredientResult)
@@ -50,13 +51,13 @@ export default function AiAnalysisResultPage() {
             <h3 className="font-bold text-[#111318] dark:text-white mb-3">성분별 분석</h3>
             <div className="flex flex-col gap-2">
               {result.ingredientAnalysis.map((ing) => {
-                const style = SAFETY_STYLES[ing.safetyLevel]
+                const style = SAFETY_STYLES[ing.safetyLevel] ?? DEFAULT_STYLE
                 const displayName = ing.koName || ing.inciName
                 return (
                   <div key={ing.inciName} className={`rounded-lg p-3 bg-gray-50 dark:bg-gray-800 ${style.border}`}>
                     <div className="flex items-center gap-2">
                       <span className={`flex h-5 w-5 items-center justify-center rounded-full ${style.badge} text-xs font-bold text-white shrink-0`}>
-                        {ing.safetyLevel === 'warning' ? '!' : '✓'}
+                        {ing.safetyLevel === '위험' ? '!' : '✓'}
                       </span>
                       <span className="font-semibold text-[#111318] dark:text-white">{displayName}</span>
                     </div>

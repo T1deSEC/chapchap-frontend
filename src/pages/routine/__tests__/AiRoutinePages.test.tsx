@@ -15,7 +15,7 @@ describe('AiRoutineResultPage', () => {
   it('good 상태일 때 "안전" 헤딩을 렌더링한다', () => {
     useAnalysisStore.setState({
       routineResult: { status: 'good', conflictingPairs: [], recommendation: '루틴이 안전합니다.', suggestedAdjustments: [] },
-      ingredientResult: null,
+
     })
     render(
       <MemoryRouter initialEntries={['/routine/ai-result']}>
@@ -35,7 +35,7 @@ describe('AiRoutineResultPage', () => {
         recommendation: '서로 다른 시간대에 사용하세요',
         suggestedAdjustments: [],
       },
-      ingredientResult: null,
+
     })
     render(
       <MemoryRouter initialEntries={['/routine/ai-result']}>
@@ -53,7 +53,7 @@ describe('AiRoutineResultPage', () => {
   it('"확인" 버튼이 /routine으로 링크된다', () => {
     useAnalysisStore.setState({
       routineResult: { status: 'good', conflictingPairs: [], recommendation: '', suggestedAdjustments: [] },
-      ingredientResult: null,
+
     })
     render(
       <MemoryRouter initialEntries={['/routine/ai-result']}>

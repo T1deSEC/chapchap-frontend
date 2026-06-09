@@ -13,7 +13,6 @@ import ChangeNicknamePage from './pages/home/ChangeNicknamePage'
 import ChangePasswordPage from './pages/home/ChangePasswordPage'
 import IngredientPage from './pages/ingredient/IngredientPage'
 import AiAnalysisLoadingPage from './pages/ingredient/AiAnalysisLoadingPage'
-import AiAnalysisResultPage from './pages/ingredient/AiAnalysisResultPage'
 import ProductDetailPage from './pages/ingredient/ProductDetailPage'
 import ProductFeedbackPage from './pages/ingredient/ProductFeedbackPage'
 import RoutinePage from './pages/routine/RoutinePage'
@@ -48,7 +47,6 @@ export default function App() {
           {/* /ingredient/ai-loading을 /:productId보다 먼저 — static segment 우선 */}
           <Route path="/ingredient" element={<IngredientPage />} />
           <Route path="/ingredient/ai-loading" element={<AiAnalysisLoadingPage />} />
-          <Route path="/ingredient/ai-result" element={<AiAnalysisResultPage />} />
           <Route path="/ingredient/:productId" element={<ProductDetailPage />} />
           <Route path="/ingredient/:productId/feedback" element={<ProductFeedbackPage />} />
 

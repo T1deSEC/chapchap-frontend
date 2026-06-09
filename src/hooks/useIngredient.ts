@@ -1,6 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { searchProducts, getProductDetail, runAiIngredientAnalysis, getProductAiAnalysis } from '../api/ingredient'
-import { useAnalysisStore } from '../store/analysisStore'
 import { useAuthStore } from '../store/authStore'
 import { useProfile } from './useProfile'
 import type { AiIngredientResult } from '../types'
@@ -20,7 +19,6 @@ export const useProductDetail = (productId: number) =>
   })
 
 export const useAiIngredientAnalysisMutation = (productId: number) => {
-  const setIngredientResult = useAnalysisStore((s) => s.setIngredientResult)
   const user = useAuthStore((s) => s.user)
   const { data: profile } = useProfile()
 
@@ -31,7 +29,6 @@ export const useAiIngredientAnalysisMutation = (productId: number) => {
         user?.skinType ?? '',
         profile?.skinConcerns ?? []
       ).then((r) => r.data as AiIngredientResult),
-    onSuccess: (data) => setIngredientResult(data),
   })
 }
 

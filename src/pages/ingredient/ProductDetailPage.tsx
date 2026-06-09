@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useProductDetail, useAiIngredientAnalysisMutation, useProductAiAnalysis } from '../../hooks/useIngredient'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
@@ -30,6 +31,7 @@ export default function ProductDetailPage() {
   const { data: product, isLoading: isProductLoading } = useProductDetail(id)
   const { data: analysis, isLoading: isAnalysisLoading } = useProductAiAnalysis(id)
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { mutateAsync: runAnalysis, isPending: isAnalyzing } = useAiIngredientAnalysisMutation(id)
 
   const analysisMap = useMemo(() => {
@@ -40,7 +42,10 @@ export default function ProductDetailPage() {
   const handleAiAnalysis = () => {
     navigate('/ingredient/ai-loading')
     runAnalysis()
-      .then(() => navigate('/ingredient/ai-result'))
+      .then((data) => {
+        queryClient.setQueryData(['productAiAnalysis', id], data)
+        navigate(`/ingredient/${productId}`)
+      })
       .catch(() => navigate(`/ingredient/${productId}`))
   }
 
@@ -145,6 +150,31 @@ export default function ProductDetailPage() {
               })}
             </div>
           </div>
+
+          {analysis?.summary && (
+            <div className="mt-2 p-4">
+              <h3 className="text-lg font-bold text-[#111318] dark:text-white">분석 요약</h3>
+              <div className="mt-3 rounded-xl bg-white dark:bg-gray-900/50 p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{analysis.summary}</p>
+              </div>
+            </div>
+          )}
+
+          {analysis?.recommendations && analysis.recommendations.length > 0 && (
+            <div className="mt-2 p-4">
+              <h3 className="text-lg font-bold text-[#111318] dark:text-white">추천 사항</h3>
+              <div className="mt-3 rounded-xl bg-white dark:bg-gray-900/50 p-4">
+                <ul className="flex flex-col gap-2">
+                  {analysis.recommendations.map((rec, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span className="material-symbols-outlined text-primary text-base mt-0.5 shrink-0">lightbulb</span>
+                      <span>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
 
           {product.skinImpacts.length > 0 && (
             <div className="mt-2 p-4">

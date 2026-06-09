@@ -30,8 +30,8 @@ const mockAnalysis = {
   summary: '전반적으로 안전한 제품입니다',
   recommendations: [],
   ingredientAnalysis: [
-    { inciName: 'Aqua', koName: '정제수', safetyLevel: 'safe' as const, assessment: '안전', reason: '기본 용제' },
-    { inciName: 'Niacinamide', koName: '나이아신아마이드', safetyLevel: 'caution' as const, assessment: '주의', reason: '고농도 주의' },
+    { inciName: 'Aqua', koName: '정제수', safetyLevel: '안전' as const, assessment: '안전', reason: '기본 용제' },
+    { inciName: 'Niacinamide', koName: '나이아신아마이드', safetyLevel: '주의' as const, assessment: '주의', reason: '고농도 주의' },
   ],
   skinImpacts: [
     { label: '보습', score: 72, level: '높음', color: 'primary' as const },
@@ -89,4 +89,17 @@ it('"피드백 제출" 링크가 올바른 경로를 가진다', async () => {
   renderDetail()
   await screen.findByText('하이드라부스트 모이스처라이저')
   expect(screen.getByText('피드백 제출').closest('a')).toHaveAttribute('href', '/ingredient/1/feedback')
+})
+
+it('분석 결과 없으면 피부 영향도 섹션이 없다', async () => {
+  renderDetail(null)
+  await screen.findByText('하이드라부스트 모이스처라이저')
+  expect(screen.queryByText('내 피부에 미치는 영향')).not.toBeInTheDocument()
+})
+
+it('분석 결과 있으면 피부 영향도 섹션이 표시된다', async () => {
+  renderDetail(mockAnalysis)
+  await screen.findByText('하이드라부스트 모이스처라이저')
+  expect(await screen.findByText('내 피부에 미치는 영향')).toBeInTheDocument()
+  expect(screen.getByText('보습')).toBeInTheDocument()
 })

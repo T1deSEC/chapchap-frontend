@@ -112,6 +112,15 @@ export default function ProductDetailPage() {
             )}
           </div>
 
+          {analysis?.summary && (
+            <div className="mt-4 p-4">
+              <h3 className="text-lg font-bold text-[#111318] dark:text-white">분석 요약</h3>
+              <div className="mt-3 rounded-xl bg-white dark:bg-gray-900/50 p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{analysis.summary}</p>
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 flex flex-col gap-4 p-4">
             <h3 className="text-lg font-bold text-[#111318] dark:text-white">전 성분 리스트</h3>
             <div className="flex flex-col gap-2">
@@ -150,15 +159,6 @@ export default function ProductDetailPage() {
               })}
             </div>
           </div>
-
-          {analysis?.summary && (
-            <div className="mt-2 p-4">
-              <h3 className="text-lg font-bold text-[#111318] dark:text-white">분석 요약</h3>
-              <div className="mt-3 rounded-xl bg-white dark:bg-gray-900/50 p-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{analysis.summary}</p>
-              </div>
-            </div>
-          )}
 
           {analysis?.recommendations && analysis.recommendations.length > 0 && (
             <div className="mt-2 p-4">

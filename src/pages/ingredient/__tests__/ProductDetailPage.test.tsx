@@ -20,10 +20,9 @@ const mockDetail = {
   category: '모이스처라이저',
   imageUrl: '',
   ingredients: [
-    { ingredientId: 1, inciName: 'Aqua', koName: '정제수', functionTags: ['용제'], concentrationOrder: 1 },
-    { ingredientId: 2, inciName: 'Niacinamide', koName: '나이아신아마이드', functionTags: ['미백'], concentrationOrder: 2 },
+    { ingredientId: 1, inciName: 'Aqua', koName: '정제수', concentrationOrder: 1 },
+    { ingredientId: 2, inciName: 'Niacinamide', koName: '나이아신아마이드', concentrationOrder: 2 },
   ],
-  skinImpacts: [],
 }
 
 const mockAnalysis = {
@@ -33,6 +32,9 @@ const mockAnalysis = {
   ingredientAnalysis: [
     { inciName: 'Aqua', koName: '정제수', safetyLevel: 'safe' as const, assessment: '안전', reason: '기본 용제' },
     { inciName: 'Niacinamide', koName: '나이아신아마이드', safetyLevel: 'caution' as const, assessment: '주의', reason: '고농도 주의' },
+  ],
+  skinImpacts: [
+    { label: '보습', score: 72, level: '높음', color: 'primary' as const },
   ],
 }
 

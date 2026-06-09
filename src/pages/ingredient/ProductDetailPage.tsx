@@ -139,9 +139,6 @@ export default function ProductDetailPage() {
                         </div>
                       )}
                     </div>
-                    <p className={`mt-1 pl-7 text-sm ${safetyLevel === '위험' ? 'text-red-500/80' : 'text-[#616f89] dark:text-gray-400'}`}>
-                      {(ing.functionTags ?? []).join(' · ')}
-                    </p>
                     {aiIng?.assessment && (
                       <p className="mt-1 pl-7 text-xs text-[#616f89] dark:text-gray-500">{aiIng.assessment}</p>
                     )}
@@ -167,11 +164,11 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {product.skinImpacts.length > 0 && (
+          {(analysis?.skinImpacts ?? []).length > 0 && (
             <div className="mt-2 p-4">
               <h3 className="text-lg font-bold text-[#111318] dark:text-white">내 피부에 미치는 영향</h3>
               <div className="mt-4 flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-gray-900/50">
-                {product.skinImpacts.map((impact) => (
+                {(analysis?.skinImpacts ?? []).map((impact) => (
                   <div key={impact.label} className="flex items-center gap-4">
                     <span className="w-16 shrink-0 text-sm font-medium text-[#616f89] dark:text-gray-400">{impact.label}</span>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">

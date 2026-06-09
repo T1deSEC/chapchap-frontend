@@ -51,7 +51,6 @@ export interface IngredientItem {
   ingredientId: number
   inciName: string
   koName: string
-  functionTags: string[]
   concentrationOrder: number
 }
 
@@ -65,7 +64,6 @@ export interface SkinImpact {
 // safetyScore는 ProductDetailPage에서 ingredients로 로컬 계산
 export interface ProductDetail extends Product {
   ingredients: IngredientItem[]
-  skinImpacts: SkinImpact[]
 }
 
 // 백엔드 IngredientAnalysisResponse와 동일한 구조
@@ -80,6 +78,7 @@ export interface AiIngredientResult {
   }>
   summary: string
   recommendations: string[]
+  skinImpacts: SkinImpact[]
 }
 
 // 백엔드 RoutineAnalysisResponse와 동일한 구조

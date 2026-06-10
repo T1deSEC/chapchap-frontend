@@ -28,7 +28,7 @@ export default function NotificationPage() {
     <motion.div
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark"
     >
       <SubpageHeader

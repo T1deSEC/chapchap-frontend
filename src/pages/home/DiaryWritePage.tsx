@@ -54,7 +54,7 @@ export default function DiaryWritePage() {
     <motion.div
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark"
     >
       <SubpageHeader title="오늘의 피부 기록" />

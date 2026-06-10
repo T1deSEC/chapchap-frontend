@@ -33,7 +33,7 @@ export default function DiaryDetailPage() {
     <motion.div
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="max-w-sm mx-auto min-h-screen flex flex-col bg-white dark:bg-background-dark"
     >
       <SubpageHeader title="피부 일기" />

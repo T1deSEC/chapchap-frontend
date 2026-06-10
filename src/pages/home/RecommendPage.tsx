@@ -14,7 +14,7 @@ export default function RecommendPage() {
     <motion.div
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="max-w-sm mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark"
     >
       <SubpageHeader title="추천 제품 전체보기" />

@@ -57,10 +57,11 @@ export default function HomePage() {
       </header>
 
       <main className="flex-grow p-4 space-y-6 pb-28">
-        {/* 피부 상태 알림 카드 */}
-        {hasTodayDiary ? (
-          <WeatherTipCard />
-        ) : (
+        {/* 날씨 피부 팁 */}
+        <WeatherTipCard />
+
+        {/* 오늘 일기 미작성 시 유도 카드 */}
+        {!hasTodayDiary && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3 dark:bg-blue-900/20 dark:border-blue-800">
             <div className="flex items-start gap-3">
               <span className="material-symbols-outlined text-blue-500 mt-0.5">edit_note</span>

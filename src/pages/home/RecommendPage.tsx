@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useRecommendedProducts } from '../../hooks/useProducts'
 import { SubpageHeader } from '../../components/SubpageHeader'
 import ProductCard from './components/ProductCard'
@@ -7,7 +8,12 @@ export default function RecommendPage() {
   const { data: products = [], isLoading } = useRecommendedProducts()
 
   return (
-    <div className="max-w-sm mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="max-w-sm mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark"
+    >
       <SubpageHeader title="추천 제품 전체보기" />
 
       <main className="flex-1 p-4 pb-28">
@@ -32,6 +38,6 @@ export default function RecommendPage() {
           </>
         )}
       </main>
-    </div>
+    </motion.div>
   )
 }

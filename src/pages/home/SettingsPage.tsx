@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { SubpageHeader } from '../../components/SubpageHeader'
@@ -41,7 +42,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark"
+    >
       <SubpageHeader title="설정" />
 
       <main className="flex-1 px-4 py-6">
@@ -80,6 +86,6 @@ export default function SettingsPage() {
           </section>
         </div>
       </main>
-    </div>
+    </motion.div>
   )
 }

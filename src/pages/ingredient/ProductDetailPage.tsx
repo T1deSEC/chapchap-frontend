@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { motion } from 'framer-motion'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProductDetail, useProductAiAnalysis } from '../../hooks/useIngredient'
 import { SubpageHeader } from '../../components/SubpageHeader'
@@ -55,7 +56,12 @@ export default function ProductDetailPage() {
   const circumference = 2 * Math.PI * 45
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden"
+    >
       <SubpageHeader title="제품 상세" />
       <div className="flex-1 pb-24">
 
@@ -202,6 +208,6 @@ export default function ProductDetailPage() {
           </div>
         </main>
       </div>
-    </div>
+    </motion.div>
   )
 }

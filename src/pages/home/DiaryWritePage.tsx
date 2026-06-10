@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useCreateDiaryMutation } from '../../hooks/useHome'
 import { SubpageHeader } from '../../components/SubpageHeader'
@@ -51,7 +52,12 @@ export default function DiaryWritePage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark"
+    >
       <SubpageHeader title="오늘의 피부 기록" />
 
       <main className="flex-grow overflow-y-auto p-6 pb-28 space-y-8">
@@ -128,6 +134,6 @@ export default function DiaryWritePage() {
           </button>
         </div>
       </main>
-    </div>
+    </motion.div>
   )
 }

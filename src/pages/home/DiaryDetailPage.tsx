@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useDiaryEntry, useDeleteDiaryMutation } from '../../hooks/useHome'
 import { SubpageHeader } from '../../components/SubpageHeader'
@@ -31,7 +32,12 @@ export default function DiaryDetailPage() {
   const [y, m, d] = entry.logDate.split('-')
 
   return (
-    <div className="max-w-sm mx-auto min-h-screen flex flex-col bg-white dark:bg-background-dark">
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="max-w-sm mx-auto min-h-screen flex flex-col bg-white dark:bg-background-dark"
+    >
       <SubpageHeader title="피부 일기" />
 
       <main className="flex-1 overflow-y-auto px-4 pt-4 pb-28 space-y-8">
@@ -89,6 +95,6 @@ export default function DiaryDetailPage() {
           </button>
         </section>
       </main>
-    </div>
+    </motion.div>
   )
 }

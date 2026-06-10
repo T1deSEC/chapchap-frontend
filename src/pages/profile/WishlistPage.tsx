@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useWishlist, useRemoveFromWishlistMutation } from '../../hooks/useWishlist'
 import { SubpageHeader } from '../../components/SubpageHeader'
@@ -17,7 +18,12 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden"
+    >
       <SubpageHeader title="위시리스트" />
       <main className="flex-grow px-4 py-6">
         {isLoading ? (
@@ -53,6 +59,6 @@ export default function WishlistPage() {
           </div>
         )}
       </main>
-    </div>
+    </motion.div>
   )
 }

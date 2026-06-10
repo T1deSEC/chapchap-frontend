@@ -145,9 +145,16 @@ export default function IngredientPage() {
                 <p className="text-sm font-bold text-[#111318] dark:text-white">
                   ⚠️ 피해야 할 성분
                 </p>
+                <motion.ul
+                  className="flex flex-col gap-2 list-none p-0 m-0"
+                  variants={listVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                 {recommendation.ingredientsToAvoid.map((ing) => (
-                  <div
+                  <motion.li
                     key={ing.ingredientId}
+                    variants={itemVariants}
                     className="rounded-xl bg-red-50 p-4 dark:bg-red-900/20"
                   >
                     <div className="flex items-start gap-3">
@@ -168,8 +175,9 @@ export default function IngredientPage() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </motion.li>
                 ))}
+                </motion.ul>
               </div>
             )}
 
@@ -179,9 +187,15 @@ export default function IngredientPage() {
                 <p className="text-sm font-bold text-[#111318] dark:text-white">
                   🏆 내 피부에 맞는 화장품
                 </p>
+                <motion.ul
+                  className="flex flex-col gap-2 list-none p-0 m-0"
+                  variants={listVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                 {recommendation.recommendedProducts.map((product) => (
+                  <motion.li key={product.productId} variants={itemVariants}>
                   <Link
-                    key={product.productId}
                     to={`/ingredient/${product.productId}`}
                     className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)] dark:bg-zinc-800"
                   >
@@ -200,7 +214,9 @@ export default function IngredientPage() {
                       chevron_right
                     </span>
                   </Link>
+                  </motion.li>
                 ))}
+                </motion.ul>
               </div>
             )}
 
@@ -272,8 +288,14 @@ export default function IngredientPage() {
           <h2 className="pb-3 pt-2 text-base font-bold text-[#111318] dark:text-white">
             검색 결과
           </h2>
+          <motion.ul
+            className="flex flex-col gap-3 list-none p-0 m-0"
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+          >
           {searchResults.map((item) => (
-            <div key={item.id} className="pb-3">
+            <motion.li key={item.id} variants={itemVariants}>
               <Link
                 to={`/ingredient/${item.id}`}
                 className="flex items-center justify-between gap-4 rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:bg-zinc-800"
@@ -292,8 +314,9 @@ export default function IngredientPage() {
                   <span className="material-symbols-outlined">water_bottle</span>
                 </div>
               </Link>
-            </div>
+            </motion.li>
           ))}
+          </motion.ul>
         </div>
       )}
     </div>

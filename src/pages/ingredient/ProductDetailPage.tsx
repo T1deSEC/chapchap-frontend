@@ -1,5 +1,8 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
+
+const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }
+const itemVariants = { hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0, transition: { duration: 0.18 } } }
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProductDetail, useProductAiAnalysis } from '../../hooks/useIngredient'
 import { SubpageHeader } from '../../components/SubpageHeader'
@@ -116,13 +119,19 @@ export default function ProductDetailPage() {
 
           <div className="mt-4 flex flex-col gap-4 p-4">
             <h3 className="text-lg font-bold text-[#111318] dark:text-white">전 성분 리스트</h3>
-            <div className="flex flex-col gap-2">
+            <motion.div
+              className="flex flex-col gap-2"
+              variants={listVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {product.ingredients.map((ing) => {
                 const aiIng = analysisMap.get(ing.inciName)
                 const safetyLevel = aiIng?.safetyLevel
                 return (
-                  <div
+                  <motion.div
                     key={ing.inciName}
+                    variants={itemVariants}
                     className={`rounded-lg p-3 ${safetyLevel === '위험' ? 'border-2 border-red-500 bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-gray-900/50'}`}
                   >
                     <div className="flex items-center justify-between">
@@ -144,24 +153,29 @@ export default function ProductDetailPage() {
                     {aiIng?.assessment && (
                       <p className="mt-1 pl-7 text-xs text-[#616f89] dark:text-gray-500">{aiIng.assessment}</p>
                     )}
-                  </div>
+                  </motion.div>
                 )
               })}
-            </div>
+            </motion.div>
           </div>
 
           {analysis?.recommendations && analysis.recommendations.length > 0 && (
             <div className="mt-2 p-4">
               <h3 className="text-lg font-bold text-[#111318] dark:text-white">추천 사항</h3>
               <div className="mt-3 rounded-xl bg-white dark:bg-gray-900/50 p-4">
-                <ul className="flex flex-col gap-2">
+                <motion.ul
+                  className="flex flex-col gap-2"
+                  variants={listVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                   {analysis.recommendations.map((rec, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <motion.li key={i} variants={itemVariants} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <span className="material-symbols-outlined text-primary text-base mt-0.5 shrink-0">lightbulb</span>
                       <span>{rec}</span>
-                    </li>
+                    </motion.li>
                   ))}
-                </ul>
+                </motion.ul>
               </div>
             </div>
           )}
@@ -169,17 +183,22 @@ export default function ProductDetailPage() {
           {(analysis?.skinImpacts ?? []).length > 0 && (
             <div className="mt-2 p-4">
               <h3 className="text-lg font-bold text-[#111318] dark:text-white">내 피부에 미치는 영향</h3>
-              <div className="mt-4 flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-gray-900/50">
+              <motion.div
+                className="mt-4 flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-gray-900/50"
+                variants={listVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {(analysis?.skinImpacts ?? []).map((impact) => (
-                  <div key={impact.label} className="flex items-center gap-4">
+                  <motion.div key={impact.label} variants={itemVariants} className="flex items-center gap-4">
                     <span className="w-16 shrink-0 text-sm font-medium text-[#616f89] dark:text-gray-400">{impact.label}</span>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                       <div className={`h-full rounded-full ${BAR_COLORS[impact.color]}`} style={{ width: `${impact.score}%` }} />
                     </div>
                     <span className={`w-16 text-right text-sm font-bold ${TEXT_COLORS[impact.color]}`}>{impact.level}</span>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           )}
 

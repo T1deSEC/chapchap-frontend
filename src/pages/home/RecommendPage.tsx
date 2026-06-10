@@ -4,6 +4,9 @@ import { SubpageHeader } from '../../components/SubpageHeader'
 import ProductCard from './components/ProductCard'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
+const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }
+const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } }
+
 export default function RecommendPage() {
   const { data: products = [], isLoading } = useRecommendedProducts()
 
@@ -30,11 +33,18 @@ export default function RecommendPage() {
                 <p className="text-sm text-gray-500 mt-1">성분 분석을 먼저 진행해보세요</p>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <motion.div
+              className="grid grid-cols-2 gap-4"
+              variants={listVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <motion.div key={product.id} variants={itemVariants}>
+                  <ProductCard product={product} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </>
         )}
       </main>

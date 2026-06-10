@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
-import { useFeedbackHistory } from '../../hooks/useFeedback'
+import { useFeedbackHistory, useDeleteFeedbackMutation } from '../../hooks/useFeedback'
 import { SubpageHeader } from '../../components/SubpageHeader'
 import { formatRelativeDate } from '../../utils/formatDate'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { useToast } from '../../hooks/useToast'
 
 const listVariants = {
   hidden: {},
@@ -13,8 +14,29 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
 }
 
+const REACTION_LABEL: Record<string, string> = {
+  good: '좋음',
+  neutral: '변화 없음',
+  trouble: '트러블 발생',
+}
+
 export default function FeedbackHistoryPage() {
   const { data: records = [], isLoading } = useFeedbackHistory()
+  const { mutate: deleteFeedback } = useDeleteFeedbackMutation()
+  const navigate = useNavigate()
+  const { showSuccess, showError } = useToast()
+
+  const handleEdit = (productId: number) => {
+    const record = records.find((r) => r.productId === productId)
+    navigate(`/ingredient/${productId}/feedback`, { state: { feedback: record } })
+  }
+
+  const handleDelete = (productId: number) => {
+    deleteFeedback(productId, {
+      onSuccess: () => showSuccess('피드백이 삭제되었습니다'),
+      onError: () => showError('삭제 중 오류가 발생했습니다'),
+    })
+  }
 
   return (
     <motion.div
@@ -42,19 +64,48 @@ export default function FeedbackHistoryPage() {
               <motion.div key={record.productId} variants={itemVariants}>
                 <div className="p-4 pb-0">
                   <div className="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-background-dark/50 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
-                    <div className="flex flex-[2_2_0px] flex-col gap-4">
+                    <div className="flex flex-[2_2_0px] flex-col gap-3">
                       <div className="flex flex-col gap-1">
                         <p className="text-base font-bold text-[#111318] dark:text-white">{record.productName}</p>
                         <p className="text-sm text-[#616f89] dark:text-gray-400">
                           {formatRelativeDate(record.createdAt)}
                         </p>
                       </div>
-                      <Link
-                        to={`/ingredient/${record.productId}`}
-                        className="flex h-8 w-fit min-w-[84px] items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-white"
-                      >
-                        자세히 보기
-                      </Link>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="flex h-7 items-center justify-center rounded-full bg-primary/10 px-3 text-xs font-medium text-primary dark:bg-primary/20">
+                          {REACTION_LABEL[record.reaction] ?? record.reaction}
+                        </span>
+                        {record.usagePeriod && (
+                          <span className="flex h-7 items-center justify-center rounded-full bg-gray-100 px-3 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                            {record.usagePeriod}
+                          </span>
+                        )}
+                        {record.rating != null && (
+                          <span className="flex items-center gap-0.5 text-xs font-medium text-yellow-500">
+                            <span
+                              className="material-symbols-outlined text-sm"
+                              style={{ fontVariationSettings: "'FILL' 1" }}
+                            >star</span>
+                            {record.rating}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(record.productId)}
+                          className="flex h-8 w-fit min-w-[56px] items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-white"
+                        >
+                          수정
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(record.productId)}
+                          className="flex h-8 w-fit min-w-[56px] items-center justify-center rounded-lg bg-red-50 px-3 text-sm font-medium text-red-500 dark:bg-red-900/20 dark:text-red-400"
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </div>
                     {record.imageUrl ? (
                       <div
@@ -66,13 +117,6 @@ export default function FeedbackHistoryPage() {
                         <span className="material-symbols-outlined text-gray-300">image</span>
                       </div>
                     )}
-                  </div>
-                </div>
-                <div className="flex gap-2 p-4 pt-3">
-                  <div className="flex h-8 shrink-0 items-center justify-center rounded-full bg-primary/10 px-3 dark:bg-primary/20">
-                    <p className="text-sm font-medium text-primary dark:text-primary/90">
-                      {record.reaction === 'good' ? '좋음' : record.reaction === 'neutral' ? '변화 없음' : '트러블 발생'}
-                    </p>
                   </div>
                 </div>
               </motion.div>

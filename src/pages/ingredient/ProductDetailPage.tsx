@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProductDetail, useProductAiAnalysis } from '../../hooks/useIngredient'
 import { SubpageHeader } from '../../components/SubpageHeader'
-import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import { ProductDetailSkeleton } from '../../components/skeletons/ProductDetailSkeleton'
 
 const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
   ing.koName || ing.inciName
@@ -43,9 +43,10 @@ export default function ProductDetailPage() {
 
   if (isProductLoading || isAnalysisLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
+      <>
+        <SubpageHeader title="제품 상세" />
+        <ProductDetailSkeleton />
+      </>
     )
   }
 

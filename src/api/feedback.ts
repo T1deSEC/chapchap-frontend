@@ -6,3 +6,6 @@ export const getFeedbackHistory = () =>
 
 export const submitFeedback = (payload: ProductFeedbackPayload) =>
   apiClient.post('/api/feedback', payload)
+
+export const deleteFeedback = (productId: number) =>
+  apiClient.delete(`/api/feedback/${productId}`)

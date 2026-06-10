@@ -143,6 +143,8 @@ export interface FeedbackRecord {
   imageUrl?: string
   effective: boolean
   reaction: FeedbackReaction
+  rating: number | null
+  usagePeriod: string | null
   memo: string
   createdAt: string
 }
@@ -150,6 +152,8 @@ export interface FeedbackRecord {
 export interface ProductFeedbackPayload {
   productId: number
   reaction: FeedbackReaction
+  rating: number
+  usagePeriod: string
   memo: string
 }
 

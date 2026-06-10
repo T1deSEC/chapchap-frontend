@@ -200,3 +200,8 @@ export interface NotificationSettings {
   ingredientRecommendEnabled: boolean
   routineAnalysisEnabled: boolean
 }
+
+// 백엔드 WeatherTipResponse와 동일한 구조
+export interface WeatherTipResponse {
+  message: string
+}

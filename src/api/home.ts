@@ -1,5 +1,5 @@
 import apiClient from './client'
-import type { DiaryEntry } from '../types'
+import type { DiaryEntry, WeatherTipResponse } from '../types'
 
 export interface CreateDiaryPayload {
   logDate: string
@@ -29,3 +29,8 @@ export const updateDiaryEntry = (id: number, payload: UpdateDiaryPayload) =>
 
 export const deleteDiaryEntry = (id: number) =>
   apiClient.delete(`/api/diary/${id}`)
+
+export const getWeatherTip = (lat?: number, lon?: number): Promise<WeatherTipResponse> =>
+  apiClient.get('/api/home/weather-tip', {
+    params: { lat, lon },
+  }).then((r) => r.data)

@@ -13,13 +13,12 @@ export default function AppLayout() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-background-light dark:bg-background-dark font-display">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: 0.12 }}
         >
           <Outlet />
         </motion.div>

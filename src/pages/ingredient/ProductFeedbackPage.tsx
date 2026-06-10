@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useSubmitFeedbackMutation } from '../../hooks/useFeedback'
 import Button from '../../components/ui/Button'
+import { useToast } from '../../hooks/useToast'
 
 const REACTIONS = ['좋음', '변화 없음', '트러블 발생'] as const
 type Reaction = typeof REACTIONS[number]
@@ -30,12 +31,19 @@ export default function ProductFeedbackPage() {
   const [comment, setComment] = useState('')
 
   const { mutate, isPending } = useSubmitFeedbackMutation()
+  const { showSuccess, showError } = useToast()
 
   const handleSubmit = () => {
     const memo = [usagePeriod, `${rating}점`, comment].filter(Boolean).join(' / ')
     mutate(
       { productId: Number(productId), reaction: mapReaction(reaction), memo },
-      { onSuccess: () => navigate(`/ingredient/${productId}`) }
+      {
+        onSuccess: () => {
+          showSuccess('피드백이 저장되었습니다')
+          navigate(`/ingredient/${productId}`)
+        },
+        onError: () => showError('저장 중 오류가 발생했습니다'),
+      }
     )
   }
 

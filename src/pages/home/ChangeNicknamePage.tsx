@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useUpdateNicknameMutation } from '../../hooks/useProfile'
 import { useAuthStore } from '../../store/authStore'
 import Button from '../../components/ui/Button'
+import { useToast } from '../../hooks/useToast'
 
 export default function ChangeNicknamePage() {
   const navigate = useNavigate()
@@ -11,6 +12,7 @@ export default function ChangeNicknamePage() {
   const [nickname, setNickname] = useState(user?.name ?? '')
   const [error, setError] = useState('')
   const { mutate, isPending } = useUpdateNicknameMutation()
+  const { showSuccess, showError } = useToast()
 
   const handleSave = () => {
     const trimmed = nickname.trim()
@@ -20,9 +22,13 @@ export default function ChangeNicknamePage() {
     mutate(trimmed, {
       onSuccess: () => {
         updateUser({ name: trimmed })
+        showSuccess('닉네임이 변경되었습니다')
         navigate('/home/settings')
       },
-      onError: () => setError('닉네임 변경에 실패했습니다.'),
+      onError: () => {
+        showError('변경 중 오류가 발생했습니다')
+        setError('닉네임 변경에 실패했습니다.')
+      },
     })
   }
 

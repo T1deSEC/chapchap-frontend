@@ -1,10 +1,21 @@
 import { Link } from 'react-router-dom'
-import { useWishlist } from '../../hooks/useWishlist'
+import { useWishlist, useRemoveFromWishlistMutation } from '../../hooks/useWishlist'
 import { SubpageHeader } from '../../components/SubpageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import { useToast } from '../../hooks/useToast'
 
 export default function WishlistPage() {
   const { data: items = [], isLoading } = useWishlist()
+  const { mutate: removeFromWishlist } = useRemoveFromWishlistMutation()
+  const { showSuccess, showError } = useToast()
+
+  const handleRemove = (productId: number) => {
+    removeFromWishlist(productId, {
+      onSuccess: () => showSuccess('위시리스트에서 삭제했습니다'),
+      onError: () => showError('오류가 발생했습니다'),
+    })
+  }
+
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
       <SubpageHeader title="위시리스트" />
@@ -35,7 +46,7 @@ export default function WishlistPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Link to={`/ingredient/${item.productId}`} className="flex h-10 flex-1 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-700 dark:bg-gray-800 dark:text-gray-300">상세 보기</Link>
-                  <button type="button" className="flex h-10 flex-1 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">루틴에 추가</button>
+                  <button type="button" onClick={() => handleRemove(item.productId)} className="flex h-10 flex-1 items-center justify-center rounded-lg bg-red-50 text-sm font-bold text-red-500 dark:bg-red-900/20 dark:text-red-400">삭제</button>
                 </div>
               </div>
             ))}

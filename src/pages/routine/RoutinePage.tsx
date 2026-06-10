@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useToast } from '../../hooks/useToast'
 import {
   DndContext,
   closestCenter,
@@ -22,7 +23,7 @@ import {
   useAiRoutineAnalysisMutation,
 } from '../../hooks/useRoutine'
 import ProductPickerSheet from '../../components/routine/ProductPickerSheet'
-import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import { RoutineSkeleton } from '../../components/skeletons/RoutineSkeleton'
 import type { RoutineItem, Product } from '../../types'
 
 type RoutineTime = 'morning' | 'evening'
@@ -96,6 +97,7 @@ function SortableProductCard({
 // --- RoutinePage ---
 export default function RoutinePage() {
   const navigate = useNavigate()
+  const { showSuccess, showError } = useToast()
   const [time, setTime] = useState<RoutineTime>('morning')
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
@@ -136,13 +138,19 @@ export default function RoutinePage() {
     const newIdx = localProducts.findIndex((p) => p.productId === over.id)
     const reordered = arrayMove(localProducts, oldIdx, newIdx)
     setLocalProducts(reordered)
-    upsert(toPayload(reordered))
+    upsert(toPayload(reordered), {
+      onSuccess: () => showSuccess('루틴이 저장되었습니다'),
+      onError: () => showError('저장 중 오류가 발생했습니다'),
+    })
   }
 
   const handleRemove = (productId: number) => {
     const updated = localProducts.filter((p) => p.productId !== productId)
     setLocalProducts(updated)
-    upsert(toPayload(updated))
+    upsert(toPayload(updated), {
+      onSuccess: () => showSuccess('루틴이 저장되었습니다'),
+      onError: () => showError('저장 중 오류가 발생했습니다'),
+    })
   }
 
   const handleAddProducts = (products: Product[]) => {
@@ -155,7 +163,10 @@ export default function RoutinePage() {
     }))
     const updated = [...localProducts, ...newItems]
     setLocalProducts(updated)
-    upsert(toPayload(updated))
+    upsert(toPayload(updated), {
+      onSuccess: () => showSuccess('루틴이 저장되었습니다'),
+      onError: () => showError('저장 중 오류가 발생했습니다'),
+    })
   }
 
   const handleReset = () => {
@@ -163,7 +174,9 @@ export default function RoutinePage() {
       onSuccess: () => {
         setLocalProducts([])
         setShowResetConfirm(false)
+        showSuccess('루틴이 초기화되었습니다')
       },
+      onError: () => showError('오류가 발생했습니다'),
     })
   }
 
@@ -231,7 +244,7 @@ export default function RoutinePage() {
       {/* 제품 목록 */}
       <div className="flex flex-col gap-2 px-4 py-2">
         {isLoading ? (
-          <div className="flex justify-center py-8"><LoadingSpinner size={32} /></div>
+          <RoutineSkeleton />
         ) : localProducts.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-12 text-center">
             <span className="material-symbols-outlined text-5xl text-gray-200 dark:text-gray-700">

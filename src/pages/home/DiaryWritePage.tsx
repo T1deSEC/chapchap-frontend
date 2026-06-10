@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCreateDiaryMutation } from '../../hooks/useHome'
 import { SubpageHeader } from '../../components/SubpageHeader'
 import Button from '../../components/ui/Button'
+import { useToast } from '../../hooks/useToast'
 
 const MOOD_OPTIONS = [
   { value: 'terrible', emoji: '😡' },
@@ -28,6 +29,7 @@ export default function DiaryWritePage() {
   const [note, setNote] = useState('')
 
   const { mutate, isPending } = useCreateDiaryMutation()
+  const { showSuccess, showError } = useToast()
 
   const toggleKeyword = (kw: string) =>
     setKeywords((prev) =>
@@ -38,7 +40,13 @@ export default function DiaryWritePage() {
     if (!mood) return
     mutate(
       { skinStatus: mood, keywords, memo: note, logDate: today },
-      { onSuccess: () => navigate('/home') }
+      {
+        onSuccess: () => {
+          showSuccess('일기가 저장되었습니다')
+          navigate('/home')
+        },
+        onError: () => showError('저장 중 오류가 발생했습니다'),
+      }
     )
   }
 

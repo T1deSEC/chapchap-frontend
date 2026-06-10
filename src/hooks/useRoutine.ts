@@ -9,13 +9,13 @@ const toPeriod = (time: 'morning' | 'evening'): 'AM' | 'PM' =>
   time === 'morning' ? 'AM' : 'PM'
 
 export const useRoutineItems = (time: 'morning' | 'evening') =>
-  useQuery({
+  useQuery<RoutineRecord | null>({
     queryKey: ['routine', 'items', time],
     queryFn: () =>
       getRoutineItems(toPeriod(time))
         .then((r) => r.data)
         .catch((err) => {
-          if (err?.response?.status === 404) return null as unknown as RoutineRecord
+          if (err?.response?.status === 404) return null
           throw err
         }),
   })

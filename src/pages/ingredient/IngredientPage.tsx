@@ -1,10 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useProductSearch } from '../../hooks/useIngredient'
 import {
   useIngredientRecommendation,
   useGenerateRecommendationMutation,
 } from '../../hooks/useIngredientRecommendation'
+import { IngredientSkeleton } from '../../components/skeletons/IngredientSkeleton'
+
+const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }
+const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } }
 
 export default function IngredientPage() {
   const [query, setQuery] = useState('')
@@ -37,11 +42,7 @@ export default function IngredientPage() {
         </h3>
 
         {recLoading ? (
-          <div className="flex items-center justify-center py-10">
-            <span className="material-symbols-outlined animate-spin text-primary text-4xl">
-              progress_activity
-            </span>
-          </div>
+          <IngredientSkeleton />
         ) : recommendation == null ? (
           /* Empty State */
           <div className="flex flex-col items-center gap-4 rounded-2xl bg-white px-6 py-10 text-center shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:bg-zinc-800">
@@ -102,31 +103,39 @@ export default function IngredientPage() {
                 <p className="text-sm font-bold text-[#111318] dark:text-white">
                   ✨ 추천 성분
                 </p>
-                {recommendation.recommendedIngredients.map((ing) => (
-                  <div
-                    key={ing.ingredientId}
-                    className="rounded-xl bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)] dark:bg-zinc-800"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                        <span className="material-symbols-outlined text-base">check</span>
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-sm font-bold text-[#111318] dark:text-white">
-                          {ing.koName || ing.inciName}
-                        </p>
-                        {ing.koName && (
-                          <p className="text-xs text-[#616f89] dark:text-gray-400">
-                            {ing.inciName}
+                <motion.ul
+                  className="flex flex-col gap-2 list-none p-0 m-0"
+                  variants={listVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {recommendation.recommendedIngredients.map((ing) => (
+                    <motion.li
+                      key={ing.ingredientId}
+                      variants={itemVariants}
+                      className="rounded-xl bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)] dark:bg-zinc-800"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                          <span className="material-symbols-outlined text-base">check</span>
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <p className="text-sm font-bold text-[#111318] dark:text-white">
+                            {ing.koName || ing.inciName}
                           </p>
-                        )}
-                        <p className="text-xs text-[#616f89] dark:text-gray-400 mt-1">
-                          {ing.reason}
-                        </p>
+                          {ing.koName && (
+                            <p className="text-xs text-[#616f89] dark:text-gray-400">
+                              {ing.inciName}
+                            </p>
+                          )}
+                          <p className="text-xs text-[#616f89] dark:text-gray-400 mt-1">
+                            {ing.reason}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    </motion.li>
+                  ))}
+                </motion.ul>
               </div>
             )}
 
@@ -250,6 +259,13 @@ export default function IngredientPage() {
           />
         </div>
       </div>
+
+      {query && searchResults.length === 0 && (
+        <div className="flex flex-col items-center py-12 text-center">
+          <span className="text-3xl mb-2">🔍</span>
+          <p className="text-sm text-gray-500 dark:text-gray-400">검색 결과가 없어요</p>
+        </div>
+      )}
 
       {searchResults.length > 0 && (
         <div className="px-4">

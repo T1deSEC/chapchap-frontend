@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useProductSearch } from '../../hooks/useProductSearch'
 import type { Product } from '../../types'
 import LoadingSpinner from '../ui/LoadingSpinner'
@@ -69,15 +70,30 @@ export default function ProductPickerSheet({ isOpen, onClose, existingProductIds
     onClose()
   }
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
-      {/* 오버레이 */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* 오버레이 */}
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={onClose}
+          />
 
-      {/* 시트 */}
-      <div className="relative z-10 flex max-h-[80vh] flex-col rounded-t-2xl bg-white dark:bg-gray-900 shadow-xl">
+          {/* 시트 */}
+          <motion.div
+            key="sheet"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-gray-900 rounded-t-2xl max-h-[80vh] flex flex-col shadow-xl"
+          >
         {/* 헤더 */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
           <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">제품 선택</h3>
@@ -166,7 +182,9 @@ export default function ProductPickerSheet({ isOpen, onClose, existingProductIds
             {selected.size > 0 ? `루틴에 추가 (${selected.size}개)` : '제품을 선택해주세요'}
           </button>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   )
 }

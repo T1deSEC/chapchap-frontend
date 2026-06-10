@@ -16,4 +16,4 @@ function renderFeedbackHistory() {
 }
 
 it('"내 피드백 기록" 헤더를 렌더링한다', () => { renderFeedbackHistory(); expect(screen.getByText('내 피드백 기록')).toBeInTheDocument() })
-it('피드백 기록을 렌더링한다', async () => { renderFeedbackHistory(); expect(await screen.findByText('이니스프리 그린티 씨드 세럼')).toBeInTheDocument(); expect(screen.getByText('2024.07.15')).toBeInTheDocument() })
+it('피드백 기록을 렌더링한다', async () => { renderFeedbackHistory(); expect(await screen.findByText('이니스프리 그린티 씨드 세럼')).toBeInTheDocument(); expect(screen.getByText('7월 15일')).toBeInTheDocument() })

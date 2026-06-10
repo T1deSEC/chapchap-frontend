@@ -42,7 +42,7 @@ export default function IngredientPage() {
               progress_activity
             </span>
           </div>
-        ) : recommendation === null ? (
+        ) : recommendation == null ? (
           /* Empty State */
           <div className="flex flex-col items-center gap-4 rounded-2xl bg-white px-6 py-10 text-center shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:bg-zinc-800">
             <div className="flex size-16 items-center justify-center rounded-full bg-primary/10">

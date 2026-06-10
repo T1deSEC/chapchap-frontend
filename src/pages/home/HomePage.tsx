@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDiaryEntries } from '../../hooks/useHome'
 import { useRecommendedProducts } from '../../hooks/useProducts'
+import { useUnreadCount } from '../../hooks/useNotifications'
 import ProductCard from './components/ProductCard'
 import DiaryCalendar from './components/DiaryCalendar'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
@@ -12,6 +13,7 @@ export default function HomePage() {
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth() + 1)
 
+  const { data: unreadCount } = useUnreadCount()
   const { data: diaryEntries = [], isLoading: diaryLoading } = useDiaryEntries(year, month)
   const { data: products = [], isLoading: productsLoading } = useRecommendedProducts()
 
@@ -29,9 +31,16 @@ export default function HomePage() {
         </div>
         <div className="flex items-center gap-4">
           <Link to="/home/notifications">
-            <span className="material-symbols-outlined text-gray-600 dark:text-gray-400">
-              notifications
-            </span>
+            <div className="relative">
+              <span className="material-symbols-outlined text-gray-600 dark:text-gray-400">
+                notifications
+              </span>
+              {unreadCount != null && unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
           </Link>
           <Link to="/home/settings">
             <span className="material-symbols-outlined text-gray-600 dark:text-gray-400">

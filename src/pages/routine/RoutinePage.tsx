@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from '../../hooks/useToast'
 import {
@@ -47,9 +48,10 @@ function SortableProductCard({
   }
 
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
+      whileTap={{ scale: 0.97 }}
       className="flex items-center gap-4 bg-white dark:bg-gray-800 px-4 min-h-[72px] py-2 rounded-xl shadow-sm"
     >
       <Link
@@ -90,7 +92,7 @@ function SortableProductCard({
           <span className="material-symbols-outlined">drag_handle</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -291,15 +293,16 @@ export default function RoutinePage() {
 
       {/* AI 안전 진단 */}
       <div className="px-4 py-4">
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.97 }}
           onClick={handleAiAnalysis}
           disabled={isAnalyzing || localProducts.length === 0}
           className="flex w-full items-center justify-center gap-3 rounded-xl bg-primary px-4 py-3 text-white shadow-lg shadow-primary/30 disabled:opacity-50"
         >
           <span className="material-symbols-outlined">verified</span>
           <span className="text-base font-bold">AI 안전 진단</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* 루틴 초기화 확인 다이얼로그 */}

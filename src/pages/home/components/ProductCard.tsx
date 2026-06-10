@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import type { Product } from '../../../types'
 
 interface ProductCardProps {
@@ -6,7 +7,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col dark:bg-gray-800 dark:border-gray-700">
+    <motion.div whileTap={{ scale: 0.97 }} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col dark:bg-gray-800 dark:border-gray-700">
       <div className="w-full aspect-square bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         {product.imageUrl ? (
           <img
@@ -24,6 +25,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
         <p className="text-gray-500 dark:text-gray-400 text-[11px]">{product.brand}</p>
       </div>
-    </div>
+    </motion.div>
   )
 }

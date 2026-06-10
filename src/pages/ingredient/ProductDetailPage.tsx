@@ -7,6 +7,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProductDetail, useProductAiAnalysis } from '../../hooks/useIngredient'
 import { SubpageHeader } from '../../components/SubpageHeader'
 import { ProductDetailSkeleton } from '../../components/skeletons/ProductDetailSkeleton'
+import { useWishlist, useAddToWishlistMutation, useRemoveFromWishlistMutation } from '../../hooks/useWishlist'
+import { useToast } from '../../hooks/useToast'
 
 const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
   ing.koName || ing.inciName
@@ -35,6 +37,41 @@ export default function ProductDetailPage() {
   const { data: product, isLoading: isProductLoading } = useProductDetail(id)
   const { data: analysis, isLoading: isAnalysisLoading } = useProductAiAnalysis(id)
   const navigate = useNavigate()
+  const { data: wishlistItems = [] } = useWishlist()
+  const isWishlisted = wishlistItems.some((item) => item.productId === id)
+  const { mutate: addToWishlist } = useAddToWishlistMutation()
+  const { mutate: removeFromWishlist } = useRemoveFromWishlistMutation()
+  const { showSuccess, showError } = useToast()
+
+  const handleToggleWishlist = () => {
+    if (isWishlisted) {
+      removeFromWishlist(id, {
+        onSuccess: () => showSuccess('위시리스트에서 삭제했습니다'),
+        onError: () => showError('오류가 발생했습니다'),
+      })
+    } else {
+      addToWishlist(id, {
+        onSuccess: () => showSuccess('위시리스트에 추가했습니다'),
+        onError: () => showError('오류가 발생했습니다'),
+      })
+    }
+  }
+
+  const wishlistButton = (
+    <button
+      type="button"
+      aria-label="찜"
+      onClick={handleToggleWishlist}
+      className="flex size-10 items-center justify-center"
+    >
+      <span
+        className="material-symbols-outlined text-2xl text-primary"
+        style={isWishlisted ? { fontVariationSettings: "'FILL' 1" } : {}}
+      >
+        favorite
+      </span>
+    </button>
+  )
 
   const analysisMap = useMemo(() => {
     if (!analysis) return new Map()
@@ -48,7 +85,7 @@ export default function ProductDetailPage() {
   if (isProductLoading || isAnalysisLoading) {
     return (
       <>
-        <SubpageHeader title="제품 상세" />
+        <SubpageHeader title="제품 상세" rightAction={wishlistButton} />
         <ProductDetailSkeleton />
       </>
     )
@@ -65,7 +102,7 @@ export default function ProductDetailPage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden"
     >
-      <SubpageHeader title="제품 상세" />
+      <SubpageHeader title="제품 상세" rightAction={wishlistButton} />
       <div className="flex-1 pb-24">
 
         <main className="flex flex-col">
@@ -211,10 +248,6 @@ export default function ProductDetailPage() {
               >
                 <span className="material-symbols-outlined">auto_awesome</span>
                 <span>{analysis ? 'AI 성분 재진단' : 'AI 성분 진단'}</span>
-              </button>
-              <button type="button" className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-primary py-2.5 text-lg font-bold text-primary">
-                <span className="material-symbols-outlined">add_task</span>
-                <span>루틴에 추가</span>
               </button>
               <Link
                 to={`/ingredient/${productId}/feedback`}

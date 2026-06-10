@@ -4,8 +4,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { vi } from 'vitest'
 import ProductDetailPage from '../ProductDetailPage'
 import * as ingredientApi from '../../../api/ingredient'
+import * as wishlistApi from '../../../api/wishlist'
 
 vi.mock('../../../api/ingredient')
+vi.mock('../../../api/wishlist')
 vi.mock('../../../hooks/useProfile', () => ({
   useProfile: () => ({ data: { skinConcerns: [] } }),
 }))
@@ -44,6 +46,9 @@ function renderDetail(analysisData: typeof mockAnalysis | null = null) {
   vi.mocked(ingredientApi.getProductAiAnalysis).mockResolvedValue(
     analysisData ? { data: analysisData } as any : Promise.reject({ response: { status: 404 } })
   )
+  vi.mocked(wishlistApi.getWishlist).mockResolvedValue({ data: [] } as any)
+  vi.mocked(wishlistApi.addToWishlist).mockResolvedValue({ data: {} } as any)
+  vi.mocked(wishlistApi.removeFromWishlist).mockResolvedValue({ data: {} } as any)
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={qc}>
@@ -102,4 +107,10 @@ it('분석 결과 있으면 피부 영향도 섹션이 표시된다', async () =
   await screen.findByText('하이드라부스트 모이스처라이저')
   expect(await screen.findByText('내 피부에 미치는 영향')).toBeInTheDocument()
   expect(screen.getByText('보습')).toBeInTheDocument()
+})
+
+it('찜 버튼(favorite 아이콘)이 헤더에 렌더링된다', async () => {
+  renderDetail()
+  await screen.findByText('하이드라부스트 모이스처라이저')
+  expect(screen.getByRole('button', { name: '찜' })).toBeInTheDocument()
 })

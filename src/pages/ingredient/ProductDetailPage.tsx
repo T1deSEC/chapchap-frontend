@@ -34,7 +34,7 @@ export default function ProductDetailPage() {
   const navigate = useNavigate()
 
   const analysisMap = useMemo(() => {
-    if (!analysis) return new Map<string, (typeof analysis.ingredientAnalysis)[number]>()
+    if (!analysis) return new Map()
     return new Map(analysis.ingredientAnalysis.map((ing) => [ing.inciName, ing]))
   }, [analysis])
 

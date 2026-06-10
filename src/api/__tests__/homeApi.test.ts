@@ -25,8 +25,8 @@ describe('home api', () => {
 
   it('createDiaryEntry는 /api/diary로 POST 요청을 보낸다', async () => {
     mockPost.mockResolvedValueOnce({ data: {} })
-    await createDiaryEntry({ mood: 'great', keywords: [], note: '', date: '2024-05-01' })
-    expect(mockPost).toHaveBeenCalledWith('/api/diary', expect.objectContaining({ mood: 'great' }))
+    await createDiaryEntry({ skinStatus: 'great', keywords: [], memo: '', logDate: '2024-05-01' })
+    expect(mockPost).toHaveBeenCalledWith('/api/diary', expect.objectContaining({ skinStatus: 'great' }))
   })
 
   it('getDiaryEntry는 /api/diary/:id로 GET 요청을 보낸다', async () => {

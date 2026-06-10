@@ -29,8 +29,6 @@ export default function DiaryDetailPage() {
 
   if (!entry) return null
 
-  const [y, m, d] = entry.logDate.split('-')
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 16 }}

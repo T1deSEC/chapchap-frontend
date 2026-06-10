@@ -23,7 +23,6 @@ const SKIN_KEYWORDS = [
 export default function DiaryWritePage() {
   const navigate = useNavigate()
   const today = new Date().toISOString().split('T')[0]
-  const [y, m, d] = today.split('-')
 
   const [mood, setMood] = useState<MoodValue | ''>('')
   const [keywords, setKeywords] = useState<string[]>([])

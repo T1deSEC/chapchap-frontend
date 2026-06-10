@@ -1,18 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useWishlist } from '../../hooks/useWishlist'
+import { SubpageHeader } from '../../components/SubpageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 export default function WishlistPage() {
   const { data: items = [], isLoading } = useWishlist()
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200/80 dark:border-gray-800/80 bg-background-light/80 dark:bg-background-dark/80 p-4 pb-3 backdrop-blur-sm">
-        <Link to="/profile" className="flex size-10 shrink-0 items-center justify-center text-gray-800 dark:text-gray-200">
-          <span className="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
-        </Link>
-        <h1 className="flex-1 text-center text-lg font-bold text-gray-900 dark:text-gray-50">찜한 제품</h1>
-        <div className="size-10 shrink-0" />
-      </div>
+      <SubpageHeader title="위시리스트" />
       <main className="flex-grow px-4 py-6">
         {isLoading ? (
           <div className="flex justify-center py-8"><LoadingSpinner /></div>

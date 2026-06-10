@@ -1,5 +1,6 @@
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useDiaryEntry, useDeleteDiaryMutation } from '../../hooks/useHome'
+import { SubpageHeader } from '../../components/SubpageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 const MOOD_MAP: Record<string, string> = {
@@ -31,16 +32,7 @@ export default function DiaryDetailPage() {
 
   return (
     <div className="max-w-sm mx-auto min-h-screen flex flex-col bg-white dark:bg-background-dark">
-      <header className="flex items-center bg-white dark:bg-background-dark px-4 py-3 justify-between border-b border-gray-200 dark:border-gray-700">
-        <Link to="/home" className="flex size-10 shrink-0 items-center justify-center">
-          <span className="material-symbols-outlined text-gray-800 dark:text-gray-200">
-            arrow_back_ios_new
-          </span>
-        </Link>
-        <h2 className="text-gray-900 dark:text-gray-100 text-lg font-bold flex-1 text-center pr-10">
-          {`${y}년 ${m}월 ${d}일 피부 기록`}
-        </h2>
-      </header>
+      <SubpageHeader title="피부 일기" />
 
       <main className="flex-1 overflow-y-auto px-4 pt-4 pb-28 space-y-8">
         {/* 기분 */}

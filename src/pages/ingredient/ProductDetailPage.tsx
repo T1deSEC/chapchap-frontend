@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProductDetail, useProductAiAnalysis } from '../../hooks/useIngredient'
+import { SubpageHeader } from '../../components/SubpageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
@@ -54,14 +55,8 @@ export default function ProductDetailPage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+      <SubpageHeader title="제품 상세" />
       <div className="flex-1 pb-24">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200/80 bg-background-light/80 p-4 pb-3 backdrop-blur-sm dark:border-gray-800/80 dark:bg-background-dark/80">
-          <Link to="/ingredient" className="flex size-10 items-center justify-center text-[#111318] dark:text-white">
-            <span className="material-symbols-outlined text-3xl">arrow_back_ios_new</span>
-          </Link>
-          <h1 className="text-[#111318] dark:text-white text-lg font-bold">성분 분석</h1>
-          <div className="size-10" />
-        </header>
 
         <main className="flex flex-col">
           <div className="flex flex-col items-center gap-4 bg-white p-6 dark:bg-gray-900/50">

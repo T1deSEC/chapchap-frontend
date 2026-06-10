@@ -16,5 +16,5 @@ function renderWishlist() {
   return render(<QueryClientProvider client={qc}><MemoryRouter><WishlistPage /></MemoryRouter></QueryClientProvider>)
 }
 
-it('"찜한 제품" 헤더를 렌더링한다', () => { renderWishlist(); expect(screen.getByText('찜한 제품')).toBeInTheDocument() })
+it('"위시리스트" 헤더를 렌더링한다', () => { renderWishlist(); expect(screen.getByText('위시리스트')).toBeInTheDocument() })
 it('찜한 제품 목록을 렌더링한다', async () => { renderWishlist(); expect(await screen.findByText('그린티 씨드 세럼')).toBeInTheDocument(); expect(screen.getByText('시카페어 크림')).toBeInTheDocument() })

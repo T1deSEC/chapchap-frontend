@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
 import { useRecommendedProducts } from '../../hooks/useProducts'
+import { SubpageHeader } from '../../components/SubpageHeader'
 import ProductCard from './components/ProductCard'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
@@ -8,17 +8,7 @@ export default function RecommendPage() {
 
   return (
     <div className="max-w-sm mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <header className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700">
-        <Link to="/home">
-          <span className="material-symbols-outlined text-gray-800 dark:text-gray-200">
-            arrow_back_ios_new
-          </span>
-        </Link>
-        <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 absolute left-1/2 -translate-x-1/2">
-          추천 제품 전체보기
-        </h1>
-        <div className="w-6" />
-      </header>
+      <SubpageHeader title="추천 제품 전체보기" />
 
       <main className="flex-1 p-4 pb-28">
         {isLoading ? (
@@ -26,11 +16,20 @@ export default function RecommendPage() {
             <LoadingSpinner />
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            {!isLoading && products.length === 0 && (
+              <div className="flex flex-col items-center py-20 text-center">
+                <span className="text-5xl mb-3">✨</span>
+                <p className="font-semibold text-gray-700 dark:text-gray-300">추천 제품이 없어요</p>
+                <p className="text-sm text-gray-500 mt-1">성분 분석을 먼저 진행해보세요</p>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </>
         )}
       </main>
     </div>

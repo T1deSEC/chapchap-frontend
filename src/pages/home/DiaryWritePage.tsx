@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreateDiaryMutation } from '../../hooks/useHome'
+import { SubpageHeader } from '../../components/SubpageHeader'
 import Button from '../../components/ui/Button'
 
 const MOOD_OPTIONS = [
@@ -43,11 +44,7 @@ export default function DiaryWritePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
-      <header className="p-4 pt-6 sticky top-0 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700 z-10">
-        <h1 className="text-lg font-semibold text-center text-gray-800 dark:text-gray-200">
-          {`${y}년 ${m}월 ${d}일 피부 기록`}
-        </h1>
-      </header>
+      <SubpageHeader title="오늘의 피부 기록" />
 
       <main className="flex-grow overflow-y-auto p-6 pb-28 space-y-8">
         {/* 기분 선택 */}

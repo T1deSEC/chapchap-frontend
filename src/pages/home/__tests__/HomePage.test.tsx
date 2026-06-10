@@ -36,18 +36,18 @@ function renderHome() {
   )
 }
 
-it('CHAPCHAP 헤더와 알림 아이콘을 렌더링한다', () => {
+it('CHAPCHAP 헤더와 알림 아이콘을 렌더링한다', async () => {
   renderHome()
-  expect(screen.getByText('CHAPCHAP')).toBeInTheDocument()
+  expect(await screen.findByText('CHAPCHAP')).toBeInTheDocument()
 })
 
-it('피부 일기 섹션 헤더를 렌더링한다', () => {
+it('피부 일기 섹션 헤더를 렌더링한다', async () => {
   renderHome()
-  expect(screen.getByText('피부 일기')).toBeInTheDocument()
+  expect(await screen.findByText('피부 일기')).toBeInTheDocument()
 })
 
-it('추천 제품 섹션과 더보기 링크를 렌더링한다', () => {
+it('추천 제품 섹션과 더보기 링크를 렌더링한다', async () => {
   renderHome()
-  expect(screen.getByText('추천 제품')).toBeInTheDocument()
-  expect(screen.getByText('더보기')).toBeInTheDocument()
+  expect(await screen.findByText('추천 제품')).toBeInTheDocument()
+  expect(await screen.findByText('더보기')).toBeInTheDocument()
 })

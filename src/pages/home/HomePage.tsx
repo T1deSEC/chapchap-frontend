@@ -5,7 +5,8 @@ import { useRecommendedProducts } from '../../hooks/useProducts'
 import { useUnreadCount } from '../../hooks/useNotifications'
 import ProductCard from './components/ProductCard'
 import DiaryCalendar from './components/DiaryCalendar'
-import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import { WeatherTipCard } from './components/WeatherTipCard'
+import { HomeSkeleton } from '../../components/skeletons/HomeSkeleton'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -16,6 +17,11 @@ export default function HomePage() {
   const { data: unreadCount } = useUnreadCount()
   const { data: diaryEntries = [], isLoading: diaryLoading } = useDiaryEntries(year, month)
   const { data: products = [], isLoading: productsLoading } = useRecommendedProducts()
+
+  const todayStr = new Date().toISOString().split('T')[0]
+  const hasTodayDiary = diaryEntries.some((e) => e.logDate === todayStr)
+
+  if (productsLoading || diaryLoading) return <HomeSkeleton />
 
   return (
     <div className="mx-auto flex flex-col max-w-sm md:max-w-xl lg:max-w-3xl px-4">
@@ -52,24 +58,28 @@ export default function HomePage() {
 
       <main className="flex-grow p-4 space-y-6 pb-28">
         {/* 피부 상태 알림 카드 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3 dark:bg-blue-900/20 dark:border-blue-800">
-          <div className="flex items-start gap-3">
-            <span className="material-symbols-outlined text-blue-500 mt-0.5">info</span>
-            <div>
-              <p className="font-bold text-blue-800 dark:text-blue-300">피부 상태 알림</p>
-              <p className="text-sm text-blue-700 dark:text-blue-400">
-                날씨가 건조하니 보습에 신경쓰세요!
-              </p>
+        {hasTodayDiary ? (
+          <WeatherTipCard />
+        ) : (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3 dark:bg-blue-900/20 dark:border-blue-800">
+            <div className="flex items-start gap-3">
+              <span className="material-symbols-outlined text-blue-500 mt-0.5">edit_note</span>
+              <div>
+                <p className="font-bold text-blue-800 dark:text-blue-300">오늘 피부 기록</p>
+                <p className="text-sm text-blue-700 dark:text-blue-400">
+                  오늘 피부 기록을 아직 안 했어요 📝
+                </p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => navigate('/home/diary/write')}
+              className="w-full bg-primary text-white font-bold py-2.5 rounded-lg text-sm text-center"
+            >
+              지금 기록하러 가기
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate('/home/diary/write')}
-            className="w-full bg-primary text-white font-bold py-2.5 rounded-lg text-sm text-center"
-          >
-            오늘의 루틴 기록하기
-          </button>
-        </div>
+        )}
 
         {/* 추천 제품 */}
         <section>
@@ -79,17 +89,11 @@ export default function HomePage() {
               더보기
             </Link>
           </div>
-          {productsLoading ? (
-            <div className="flex justify-center py-4">
-              <LoadingSpinner size={32} />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {products.slice(0, 2).map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-4">
+            {products.slice(0, 2).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </section>
 
         {/* 피부 일기 캘린더 */}
@@ -97,19 +101,13 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-800 dark:text-white">피부 일기</h2>
           </div>
-          {diaryLoading ? (
-            <div className="flex justify-center py-4">
-              <LoadingSpinner size={32} />
-            </div>
-          ) : (
-            <DiaryCalendar
-              year={year}
-              month={month}
-              entries={diaryEntries}
-              onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
-              onDayClick={(entry) => navigate(`/home/diary/${entry.id}`)}
-            />
-          )}
+          <DiaryCalendar
+            year={year}
+            month={month}
+            entries={diaryEntries}
+            onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
+            onDayClick={(entry) => navigate(`/home/diary/${entry.id}`)}
+          />
         </section>
       </main>
     </div>

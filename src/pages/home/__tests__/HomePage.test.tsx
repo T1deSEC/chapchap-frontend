@@ -4,22 +4,27 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { vi } from 'vitest'
 import HomePage from '../HomePage'
 import * as homeApi from '../../../api/home'
-import * as productsApi from '../../../api/products'
+import * as recommendationApi from '../../../api/recommendation'
 
 vi.mock('../../../api/home')
-vi.mock('../../../api/products')
+vi.mock('../../../api/recommendation')
 
-const mockProducts = [
-  {
-    id: 1, name: '비타C 세럼', brand: '더마로직', category: '세럼',
-    imageUrl: '', keyIngredients: ['비타민 C'], skinTypes: ['지성'],
-  },
-]
+const mockRecommendation = {
+  createdAt: '2026-06-10T00:00:00+00:00',
+  summary: '테스트 추천',
+  recommendedIngredients: [],
+  ingredientsToAvoid: [],
+  recommendedProducts: [
+    { productId: 1, name: '비타C 세럼', brand: '더마로직', imageUrl: '', matchScore: 0.9, rankOrder: 1 },
+    { productId: 2, name: '수딩 크림', brand: '스킨랩', imageUrl: '', matchScore: 0.7, rankOrder: 2 },
+  ],
+}
 
-function renderHome() {
+function renderHome(withRecommendation = true) {
   vi.mocked(homeApi.getDiaryEntries).mockResolvedValue({ data: [] } as any)
-  vi.mocked(productsApi.getRecommendedProducts).mockResolvedValue({ data: mockProducts } as any)
-
+  vi.mocked(recommendationApi.getIngredientRecommendation).mockResolvedValue(
+    withRecommendation ? ({ data: mockRecommendation } as any) : Promise.reject({ response: { status: 404 } })
+  )
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={qc}>
@@ -50,4 +55,14 @@ it('추천 제품 섹션과 더보기 링크를 렌더링한다', async () => {
   renderHome()
   expect(await screen.findByText('추천 제품')).toBeInTheDocument()
   expect(await screen.findByText('더보기')).toBeInTheDocument()
+})
+
+it('AI 추천 결과가 있으면 제품 이름을 렌더링한다', async () => {
+  renderHome(true)
+  expect(await screen.findByText('비타C 세럼')).toBeInTheDocument()
+})
+
+it('AI 추천 결과가 없으면 안내 문구를 렌더링한다', async () => {
+  renderHome(false)
+  expect(await screen.findByText(/성분 탭에서 분석을 먼저 진행해보세요/)).toBeInTheDocument()
 })

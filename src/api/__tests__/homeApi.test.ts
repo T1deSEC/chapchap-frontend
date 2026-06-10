@@ -6,7 +6,6 @@ import {
   getDiaryEntry,
   deleteDiaryEntry,
 } from '../home'
-import { getRecommendedProducts } from '../products'
 import { getNotifications } from '../notifications'
 
 vi.mock('../client', () => ({ default: { get: vi.fn(), post: vi.fn(), delete: vi.fn(), put: vi.fn() } }))
@@ -39,14 +38,6 @@ describe('home api', () => {
     mockDelete.mockResolvedValueOnce({ data: {} })
     await deleteDiaryEntry(42)
     expect(mockDelete).toHaveBeenCalledWith('/api/diary/42')
-  })
-})
-
-describe('products api', () => {
-  it('getRecommendedProducts는 /api/recommendations로 GET 요청을 보낸다', async () => {
-    mockGet.mockResolvedValueOnce({ data: [] })
-    await getRecommendedProducts()
-    expect(mockGet).toHaveBeenCalledWith('/api/recommendations')
   })
 })
 

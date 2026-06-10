@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDiaryEntries } from '../../hooks/useHome'
-import { useRecommendedProducts } from '../../hooks/useProducts'
+import { useIngredientRecommendation } from '../../hooks/useIngredientRecommendation'
 import { useUnreadCount } from '../../hooks/useNotifications'
 import ProductCard from './components/ProductCard'
 import DiaryCalendar from './components/DiaryCalendar'
@@ -16,12 +16,12 @@ export default function HomePage() {
 
   const { data: unreadCount } = useUnreadCount()
   const { data: diaryEntries = [], isLoading: diaryLoading } = useDiaryEntries(year, month)
-  const { data: products = [], isLoading: productsLoading } = useRecommendedProducts()
+  const { data: recommendation, isLoading: recLoading } = useIngredientRecommendation()
 
   const todayStr = new Date().toISOString().split('T')[0]
   const hasTodayDiary = diaryEntries.some((e) => e.logDate === todayStr)
 
-  if (productsLoading || diaryLoading) return <HomeSkeleton />
+  if (recLoading || diaryLoading) return <HomeSkeleton />
 
   return (
     <div className="mx-auto flex flex-col max-w-sm md:max-w-xl lg:max-w-3xl px-4">
@@ -90,11 +90,20 @@ export default function HomePage() {
               더보기
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {products.slice(0, 2).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {recommendation ? (
+            <div className="grid grid-cols-2 gap-4">
+              {recommendation.recommendedProducts.slice(0, 2).map((rp) => (
+                <ProductCard
+                  key={rp.productId}
+                  product={{ id: rp.productId, name: rp.name, brand: rp.brand, category: '', imageUrl: rp.imageUrl }}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-xl bg-white dark:bg-gray-800 px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+              아직 AI 추천 결과가 없어요.<br />성분 탭에서 분석을 먼저 진행해보세요.
+            </p>
+          )}
         </section>
 
         {/* 피부 일기 캘린더 */}

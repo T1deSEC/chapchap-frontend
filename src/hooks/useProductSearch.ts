@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query'
 import { searchProducts } from '../api/products'
 
 export const useProductSearch = (query: string) =>
@@ -12,4 +12,5 @@ export const useProductSearch = (query: string) =>
       return number + 1 < totalPages ? number + 1 : undefined
     },
     staleTime: 1000 * 60 * 2,
+    placeholderData: keepPreviousData,
   })

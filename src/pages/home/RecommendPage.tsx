@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useRecommendedProducts } from '../../hooks/useProducts'
+import { useIngredientRecommendation } from '../../hooks/useIngredientRecommendation'
 import { SubpageHeader } from '../../components/SubpageHeader'
 import ProductCard from './components/ProductCard'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
@@ -8,7 +8,14 @@ const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1
 const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } }
 
 export default function RecommendPage() {
-  const { data: products = [], isLoading } = useRecommendedProducts()
+  const { data: recommendation, isLoading } = useIngredientRecommendation()
+  const products = recommendation?.recommendedProducts.map((rp) => ({
+    id: rp.productId,
+    name: rp.name,
+    brand: rp.brand,
+    category: '',
+    imageUrl: rp.imageUrl,
+  })) ?? []
 
   return (
     <motion.div
@@ -26,7 +33,7 @@ export default function RecommendPage() {
           </div>
         ) : (
           <>
-            {!isLoading && products.length === 0 && (
+            {products.length === 0 && (
               <div className="flex flex-col items-center py-20 text-center">
                 <span className="text-5xl mb-3">✨</span>
                 <p className="font-semibold text-gray-700 dark:text-gray-300">추천 제품이 없어요</p>

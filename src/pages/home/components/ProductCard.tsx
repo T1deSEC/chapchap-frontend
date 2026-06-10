@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Product } from '../../../types'
 
@@ -7,6 +8,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
+    <Link to={`/ingredient/${product.id}`}>
     <motion.div whileTap={{ scale: 0.97 }} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col dark:bg-gray-800 dark:border-gray-700">
       <div className="w-full aspect-square bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         {product.imageUrl ? (
@@ -26,5 +28,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-gray-500 dark:text-gray-400 text-[11px]">{product.brand}</p>
       </div>
     </motion.div>
+    </Link>
   )
 }

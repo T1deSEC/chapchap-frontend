@@ -34,13 +34,13 @@ export default function NotificationPage() {
       <SubpageHeader
         title="알림"
         rightAction={
-          notifications.some((n) => !n.read) ? (
+          notifications.length > 0 ? (
             <button
               type="button"
               onClick={() => markAll()}
               className="text-xs font-medium text-primary whitespace-nowrap"
             >
-              전체 읽음
+              전체 지우기
             </button>
           ) : undefined
         }
@@ -60,12 +60,8 @@ export default function NotificationPage() {
               key={n.id}
               type="button"
               variants={itemVariants}
-              onClick={() => !n.read && markOne(n.id)}
-              className={`flex items-start gap-4 rounded-lg border p-4 text-left w-full transition-colors ${
-                n.read
-                  ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
-                  : 'border-primary/30 bg-primary/5 dark:bg-primary/10'
-              }`}
+              onClick={() => markOne(n.id)}
+              className="flex items-start gap-4 rounded-lg border border-primary/30 bg-primary/5 p-4 text-left w-full transition-colors dark:bg-primary/10"
             >
               <div className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                 <span className="material-symbols-outlined text-primary">

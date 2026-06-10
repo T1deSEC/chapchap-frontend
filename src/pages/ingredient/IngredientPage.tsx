@@ -1,20 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useProductSearch } from '../../hooks/useIngredient'
+import { useProductSearch } from '../../hooks/useProductSearch'
 import {
   useIngredientRecommendation,
   useGenerateRecommendationMutation,
 } from '../../hooks/useIngredientRecommendation'
 import { IngredientSkeleton } from '../../components/skeletons/IngredientSkeleton'
+import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
 const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } }
 
 export default function IngredientPage() {
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 300)
+    return () => clearTimeout(t)
+  }, [query])
+
   const { data: recommendation, isLoading: recLoading } = useIngredientRecommendation()
-  const { data: searchResults = [] } = useProductSearch(query, '전체')
+  const {
+    data,
+    isLoading: searchLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useProductSearch(debouncedQuery)
+  const searchResults = data?.pages.flatMap((p) => p.content) ?? []
   const generateMutation = useGenerateRecommendationMutation()
 
   const handleGenerate = () => generateMutation.mutate()
@@ -276,7 +291,13 @@ export default function IngredientPage() {
         </div>
       </div>
 
-      {query && searchResults.length === 0 && (
+      {debouncedQuery && searchLoading && (
+        <div className="flex justify-center py-8">
+          <LoadingSpinner size={32} />
+        </div>
+      )}
+
+      {debouncedQuery && !searchLoading && searchResults.length === 0 && (
         <div className="flex flex-col items-center py-12 text-center">
           <span className="text-3xl mb-2">🔍</span>
           <p className="text-sm text-gray-500 dark:text-gray-400">검색 결과가 없어요</p>
@@ -317,6 +338,23 @@ export default function IngredientPage() {
             </motion.li>
           ))}
           </motion.ul>
+          {hasNextPage && (
+            <button
+              type="button"
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#e0e4ef] bg-white py-3 text-sm font-medium text-[#616f89] disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-gray-400"
+            >
+              {isFetchingNextPage ? (
+                <><LoadingSpinner size={16} /><span>불러오는 중...</span></>
+              ) : (
+                <><span className="material-symbols-outlined text-base">expand_more</span><span>더 보기</span></>
+              )}
+            </button>
+          )}
+          {!hasNextPage && searchResults.length > 0 && debouncedQuery && (
+            <p className="py-3 text-center text-xs text-gray-300">더 이상 제품이 없습니다</p>
+          )}
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { SubpageHeader } from '../../components/SubpageHeader'
 import ProductCard from './components/ProductCard'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
-const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }
+const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }
 const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } }
 
 export default function RecommendPage() {

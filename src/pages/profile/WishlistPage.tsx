@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
-const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }
+const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }
 const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } }
 import { useWishlist, useRemoveFromWishlistMutation } from '../../hooks/useWishlist'
 import { SubpageHeader } from '../../components/SubpageHeader'

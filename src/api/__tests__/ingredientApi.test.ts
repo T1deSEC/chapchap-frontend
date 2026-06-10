@@ -40,7 +40,7 @@ describe('ingredient api', () => {
 
   it('submitFeedback은 /api/feedback으로 POST 요청을 보낸다', async () => {
     mockPost.mockResolvedValueOnce({ data: {} })
-    const payload = { productId: 1, reaction: 'good' as const, memo: '좋아요' }
+    const payload = { productId: 1, reaction: 'good' as const, rating: 4, usagePeriod: '2-4주', memo: '좋아요' }
     await submitFeedback(payload)
     expect(mockPost).toHaveBeenCalledWith('/api/feedback', payload)
   })

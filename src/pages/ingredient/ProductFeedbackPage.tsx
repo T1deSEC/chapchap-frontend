@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom'
 import { useSubmitFeedbackMutation } from '../../hooks/useFeedback'
 import Button from '../../components/ui/Button'
 import { useToast } from '../../hooks/useToast'
+import type { FeedbackRecord } from '../../types'
 
 const REACTIONS = ['좋음', '변화 없음', '트러블 발생'] as const
 type Reaction = typeof REACTIONS[number]
@@ -10,12 +11,13 @@ type Reaction = typeof REACTIONS[number]
 export const mapReaction = (
   reaction: '좋음' | '변화 없음' | '트러블 발생'
 ): 'good' | 'neutral' | 'trouble' => {
-  const map = {
-    '좋음': 'good',
-    '변화 없음': 'neutral',
-    '트러블 발생': 'trouble',
-  } as const
+  const map = { '좋음': 'good', '변화 없음': 'neutral', '트러블 발생': 'trouble' } as const
   return map[reaction]
+}
+
+export const reverseMapReaction = (r: 'good' | 'neutral' | 'trouble'): Reaction => {
+  const map = { good: '좋음', neutral: '변화 없음', trouble: '트러블 발생' } as const
+  return map[r]
 }
 
 const USAGE_PERIODS = ['1주일 미만', '1-2주', '2-4주', '1개월 이상']
@@ -23,20 +25,29 @@ const USAGE_PERIODS = ['1주일 미만', '1-2주', '2-4주', '1개월 이상']
 export default function ProductFeedbackPage() {
   const { productId } = useParams<{ productId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
+  const existingFeedback = (location.state as { feedback?: FeedbackRecord } | null)?.feedback
 
-  const [reaction, setReaction] = useState<Reaction>('좋음')
-  const [rating, setRating] = useState(4)
+  const [reaction, setReaction] = useState<Reaction>(
+    existingFeedback ? reverseMapReaction(existingFeedback.reaction) : '좋음'
+  )
+  const [rating, setRating] = useState<number>(existingFeedback?.rating ?? 4)
   const [hoverRating, setHoverRating] = useState(0)
-  const [usagePeriod, setUsagePeriod] = useState('2-4주')
-  const [comment, setComment] = useState('')
+  const [usagePeriod, setUsagePeriod] = useState(existingFeedback?.usagePeriod ?? '2-4주')
+  const [comment, setComment] = useState(existingFeedback?.memo ?? '')
 
   const { mutate, isPending } = useSubmitFeedbackMutation()
   const { showSuccess, showError } = useToast()
 
   const handleSubmit = () => {
-    const memo = [usagePeriod, `${rating}점`, comment].filter(Boolean).join(' / ')
     mutate(
-      { productId: Number(productId), reaction: mapReaction(reaction), memo },
+      {
+        productId: Number(productId),
+        reaction: mapReaction(reaction),
+        rating,
+        usagePeriod,
+        memo: comment,
+      },
       {
         onSuccess: () => {
           showSuccess('피드백이 저장되었습니다')
@@ -51,7 +62,7 @@ export default function ProductFeedbackPage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
-      <div className="flex-1 pb-24">
+      <div className="flex-1 pb-44">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200/80 bg-background-light/80 p-4 pb-3 backdrop-blur-sm dark:border-gray-800/80 dark:bg-background-dark/80">
           <Link to={`/ingredient/${productId}`} className="flex size-10 items-center justify-center text-gray-600 dark:text-gray-300">
             <span className="material-symbols-outlined text-3xl">arrow_back_ios_new</span>
@@ -137,7 +148,7 @@ export default function ProductFeedbackPage() {
         </main>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light p-4 dark:bg-background-dark">
+      <footer className="fixed bottom-24 left-0 right-0 z-10 bg-background-light p-4 dark:bg-background-dark">
         <Button fullWidth onClick={handleSubmit} loading={isPending}>
           피드백 제출
         </Button>

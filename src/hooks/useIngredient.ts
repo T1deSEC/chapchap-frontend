@@ -37,5 +37,4 @@ export const useProductAiAnalysis = (productId: number) =>
           if (err?.response?.status === 404) return null
           throw err
         }),
-    staleTime: 0,
   })

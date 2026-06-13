@@ -15,6 +15,7 @@ const schema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
   email: z.string().email('유효한 이메일을 입력해주세요'),
   password: z.string().min(6, '비밀번호는 6자 이상이어야 합니다'),
+  registrationToken: z.string().min(1, '가입 코드를 입력해주세요'),
 })
 
 type FormData = z.infer<typeof schema>
@@ -36,7 +37,7 @@ export default function RegisterPage() {
       setSkinTypeError('피부타입을 선택해주세요')
       return
     }
-    const res = await registerApi(data.name, data.email, data.password, skinType)
+    const res = await registerApi(data.name, data.email, data.password, skinType, data.registrationToken)
     loginStore(res.data.accessToken, res.data.refreshToken, res.data.user)
     navigate('/home')
   }
@@ -91,6 +92,14 @@ export default function RegisterPage() {
           </div>
           {skinTypeError && <p className="mt-1 text-xs text-red-500">{skinTypeError}</p>}
         </div>
+
+        <Input
+          label="가입 코드"
+          type="password"
+          placeholder="가입 코드를 입력해주세요"
+          error={errors.registrationToken?.message}
+          {...register('registrationToken')}
+        />
 
         <Button type="submit" fullWidth loading={isSubmitting}>
           회원가입

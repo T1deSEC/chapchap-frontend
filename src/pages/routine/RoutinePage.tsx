@@ -41,58 +41,57 @@ function SortableProductCard({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.productId,
   })
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
 
   return (
-    <motion.div
+    <div
       ref={setNodeRef}
-      style={style}
-      whileTap={{ scale: 0.97 }}
-      className="flex items-center gap-4 bg-white dark:bg-gray-800 px-4 min-h-[72px] py-2 rounded-xl shadow-sm"
+      style={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      <Link
-        to={`/ingredient/${item.productId}`}
-        className="flex items-center gap-4 flex-1 min-w-0"
-        onClick={(e) => isDragging && e.preventDefault()}
+      <div
+        style={{ opacity: isDragging ? 0.5 : 1 }}
+        className="flex items-center gap-4 bg-white dark:bg-gray-800 px-4 min-h-[72px] py-2 rounded-xl shadow-sm"
       >
-        {item.imageUrl ? (
-          <img src={item.imageUrl} alt={item.productName} className="size-14 rounded-lg object-cover shrink-0" />
-        ) : (
-          <div className="size-14 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-gray-300">image</span>
+        <Link
+          to={`/ingredient/${item.productId}`}
+          className="flex items-center gap-4 flex-1 min-w-0"
+          onClick={(e) => isDragging && e.preventDefault()}
+        >
+          {item.imageUrl ? (
+            <img src={item.imageUrl} alt={item.productName} className="size-14 rounded-lg object-cover shrink-0" />
+          ) : (
+            <div className="size-14 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-gray-300">image</span>
+            </div>
+          )}
+          <div className="flex flex-col justify-center min-w-0">
+            <p className="text-[#111318] dark:text-white text-base font-medium leading-normal line-clamp-1">
+              {item.productName}
+            </p>
+            <p className="text-[#616f89] dark:text-gray-400 text-sm font-normal leading-normal">
+              {item.brand}
+            </p>
           </div>
-        )}
-        <div className="flex flex-col justify-center min-w-0">
-          <p className="text-[#111318] dark:text-white text-base font-medium leading-normal line-clamp-1">
-            {item.productName}
-          </p>
-          <p className="text-[#616f89] dark:text-gray-400 text-sm font-normal leading-normal">
-            {item.brand}
-          </p>
-        </div>
-      </Link>
-      <div className="shrink-0 flex items-center gap-2">
-        <button
-          type="button"
-          aria-label={`${item.productName} 루틴에서 제거`}
-          onClick={() => onRemove(item.productId)}
-          className="text-gray-400 dark:text-gray-500 flex size-7 items-center justify-center"
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
-        </button>
-        <div
-          {...attributes}
-          {...listeners}
-          className="text-[#616f89] dark:text-gray-400 flex size-7 items-center justify-center cursor-grab active:cursor-grabbing"
-        >
-          <span className="material-symbols-outlined">drag_handle</span>
+        </Link>
+        <div className="shrink-0 flex items-center gap-2">
+          <button
+            type="button"
+            aria-label={`${item.productName} 루틴에서 제거`}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => onRemove(item.productId)}
+            className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 flex size-7 items-center justify-center transition-colors"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
+          </button>
+          <div
+            {...attributes}
+            {...listeners}
+            className="text-[#616f89] dark:text-gray-400 flex size-7 items-center justify-center cursor-grab active:cursor-grabbing"
+          >
+            <span className="material-symbols-outlined">drag_handle</span>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -195,7 +194,7 @@ export default function RoutinePage() {
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden pb-24">
       {/* 헤더 */}
       <div className="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
-        <div className="flex size-12 shrink-0 items-center" />
+        <div className="w-[84px] shrink-0" />
         <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
           루틴 관리
         </h2>
@@ -208,16 +207,14 @@ export default function RoutinePage() {
           >
             <span className="material-symbols-outlined">add</span>
           </button>
-          {routine && (
-            <button
-              type="button"
-              aria-label="루틴 초기화"
-              onClick={() => setShowResetConfirm(true)}
-              className="flex size-10 cursor-pointer items-center justify-center rounded-lg text-gray-400 dark:text-gray-500"
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>delete_sweep</span>
-            </button>
-          )}
+          <button
+            type="button"
+            aria-label="루틴 초기화"
+            onClick={() => setShowResetConfirm(true)}
+            className={`flex size-10 cursor-pointer items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 ${!routine ? 'invisible pointer-events-none' : ''}`}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>delete_sweep</span>
+          </button>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import { register as registerApi } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
 import Button from '../../components/ui/Button'
@@ -25,6 +26,7 @@ export default function RegisterPage() {
   const loginStore = useAuthStore((s) => s.login)
   const [skinType, setSkinType] = useState('')
   const [skinTypeError, setSkinTypeError] = useState('')
+  const [submitError, setSubmitError] = useState('')
 
   const {
     register,
@@ -37,9 +39,24 @@ export default function RegisterPage() {
       setSkinTypeError('피부타입을 선택해주세요')
       return
     }
-    const res = await registerApi(data.name, data.email, data.password, skinType, data.registrationToken)
-    loginStore(res.data.accessToken, res.data.refreshToken, res.data.user)
-    navigate('/home')
+    setSubmitError('')
+    try {
+      const res = await registerApi(data.name, data.email, data.password, skinType, data.registrationToken)
+      loginStore(res.data.accessToken, res.data.refreshToken, res.data.user)
+      navigate('/home')
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status
+        const message = err.response?.data?.message
+        if (status === 429) {
+          setSubmitError('가입 시도 횟수를 초과했습니다. 1시간 후 다시 시도해주세요.')
+        } else if (status === 403) {
+          setSubmitError(message ?? '가입 코드가 올바르지 않습니다.')
+        } else {
+          setSubmitError(message ?? '회원가입 중 오류가 발생했습니다.')
+        }
+      }
+    }
   }
 
   return (
@@ -100,6 +117,10 @@ export default function RegisterPage() {
           error={errors.registrationToken?.message}
           {...register('registrationToken')}
         />
+
+        {submitError && (
+          <p className="text-sm text-red-500 text-center">{submitError}</p>
+        )}
 
         <Button type="submit" fullWidth loading={isSubmitting}>
           회원가입

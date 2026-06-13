@@ -27,7 +27,7 @@ export default function WishlistPage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden"
     >
-      <SubpageHeader title="위시리스트" />
+      <SubpageHeader title="위시리스트" backTo="/profile" />
       <main className="flex-grow px-4 py-6">
         {isLoading ? (
           <div className="flex justify-center py-8"><LoadingSpinner /></div>

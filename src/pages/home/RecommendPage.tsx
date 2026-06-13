@@ -24,7 +24,7 @@ export default function RecommendPage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="max-w-sm mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark"
     >
-      <SubpageHeader title="추천 제품 전체보기" />
+      <SubpageHeader title="추천 제품 전체보기" backTo="/home" />
 
       <main className="flex-1 p-4 pb-28">
         {isLoading ? (

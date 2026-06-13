@@ -64,7 +64,7 @@ export default function ProductFeedbackPage() {
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
       <div className="flex-1 pb-44">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200/80 bg-background-light/80 p-4 pb-3 backdrop-blur-sm dark:border-gray-800/80 dark:bg-background-dark/80">
-          <Link to={`/ingredient/${productId}`} className="flex size-10 items-center justify-center text-gray-600 dark:text-gray-300">
+          <Link to="/ingredient" className="flex size-10 items-center justify-center text-gray-600 dark:text-gray-300">
             <span className="material-symbols-outlined text-3xl">arrow_back_ios_new</span>
           </Link>
           <h1 className="text-lg font-bold text-[#111318] dark:text-white">피드백 입력</h1>

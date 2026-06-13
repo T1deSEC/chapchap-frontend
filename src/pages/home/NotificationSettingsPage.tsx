@@ -46,7 +46,7 @@ export default function NotificationSettingsPage() {
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
       <header className="sticky top-0 z-10 flex h-14 items-center border-b border-gray-200/80 bg-white/80 px-4 backdrop-blur-sm dark:border-gray-800/80 dark:bg-background-dark/80">
-        <Link to="/home/settings" className="flex h-10 w-10 items-center justify-center -ml-2">
+        <Link to="/home" className="flex h-10 w-10 items-center justify-center -ml-2">
           <span className="material-symbols-outlined text-2xl text-gray-900 dark:text-white">arrow_back_ios_new</span>
         </Link>
         <h1 className="flex-1 text-center text-lg font-bold text-gray-900 dark:text-white">알림 설정</h1>

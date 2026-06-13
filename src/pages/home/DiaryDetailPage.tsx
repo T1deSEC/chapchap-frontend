@@ -36,7 +36,7 @@ export default function DiaryDetailPage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="max-w-sm mx-auto min-h-screen flex flex-col bg-white dark:bg-background-dark"
     >
-      <SubpageHeader title="피부 일기" />
+      <SubpageHeader title="피부 일기" backTo="/home" />
 
       <main className="flex-1 overflow-y-auto px-4 pt-4 pb-28 space-y-8">
         {/* 기분 */}

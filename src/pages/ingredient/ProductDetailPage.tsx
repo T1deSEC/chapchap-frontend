@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { useMemo, useState, useEffect } from 'react'
+import { motion, animate } from 'framer-motion'
 
 const listVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }
 const itemVariants = { hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0, transition: { duration: 0.18 } } }
@@ -9,6 +9,21 @@ import { SubpageHeader } from '../../components/SubpageHeader'
 import { ProductDetailSkeleton } from '../../components/skeletons/ProductDetailSkeleton'
 import { useWishlist, useAddToWishlistMutation, useRemoveFromWishlistMutation } from '../../hooks/useWishlist'
 import { useToast } from '../../hooks/useToast'
+import { useProfile } from '../../hooks/useProfile'
+
+function AnimatedScore({ score }: { score: number }) {
+  const [display, setDisplay] = useState(0)
+  useEffect(() => {
+    const controls = animate(0, score, {
+      duration: 1.0,
+      ease: 'easeOut',
+      delay: 0.2,
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return controls.stop
+  }, [score])
+  return <>{display}</>
+}
 
 const getIngredientDisplayName = (ing: { koName: string; inciName: string }) =>
   ing.koName || ing.inciName
@@ -18,6 +33,11 @@ const SAFETY_BADGE: Record<string, string> = {
   '주의': 'bg-yellow-400',
   '위험': 'bg-red-500',
 }
+
+const SKIN_IMPACT_ORDER = [
+  '보습', '피부 장벽', '미백·톤업', '항산화', '진정·항염',
+  '각질케어', '항노화·재생', '탄력', '피지·모공', '항균·트러블케어', '자외선 차단',
+]
 
 const BAR_COLORS: Record<string, string> = {
   primary: 'bg-primary',
@@ -37,11 +57,13 @@ export default function ProductDetailPage() {
   const { data: product, isLoading: isProductLoading } = useProductDetail(id)
   const { data: analysis, isLoading: isAnalysisLoading } = useProductAiAnalysis(id)
   const navigate = useNavigate()
+  const { data: profile } = useProfile()
   const { data: wishlistItems = [] } = useWishlist()
   const isWishlisted = wishlistItems.some((item) => item.productId === id)
   const { mutate: addToWishlist } = useAddToWishlistMutation()
   const { mutate: removeFromWishlist } = useRemoveFromWishlistMutation()
   const { showSuccess, showError } = useToast()
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const handleToggleWishlist = () => {
     if (isWishlisted) {
@@ -78,8 +100,26 @@ export default function ProductDetailPage() {
     return new Map(analysis.ingredientAnalysis.map((ing) => [ing.inciName, ing]))
   }, [analysis])
 
+  const FOLD_LIMIT = 10
+  const hasAnalyzed = !!analysis && analysisMap.size > 0
+  const primaryIngredients = hasAnalyzed
+    ? (product?.ingredients ?? []).filter((ing) => analysisMap.has(ing.inciName))
+    : (product?.ingredients ?? []).slice(0, FOLD_LIMIT)
+  const secondaryIngredients = hasAnalyzed
+    ? (product?.ingredients ?? []).filter((ing) => !analysisMap.has(ing.inciName))
+    : (product?.ingredients ?? []).slice(FOLD_LIMIT)
+  const visibleIngredients = isExpanded
+    ? [...primaryIngredients, ...secondaryIngredients]
+    : primaryIngredients
+
   const handleAiAnalysis = () => {
-    navigate('/ingredient/ai-loading', { state: { productId: id } })
+    navigate('/ingredient/ai-loading', {
+      state: {
+        productId: id,
+        skinType: profile?.skinType ?? '',
+        skinConcerns: profile?.skinConcerns ?? [],
+      },
+    })
   }
 
   if (isProductLoading || isAnalysisLoading) {
@@ -121,18 +161,21 @@ export default function ProductDetailPage() {
               <div className="relative size-32">
                 <svg className="size-full" viewBox="0 0 100 100">
                   <circle className="stroke-current text-gray-200 dark:text-gray-700" cx="50" cy="50" r="45" fill="transparent" strokeWidth="10" />
-                  <circle
+                  <motion.circle
+                    key={analysis.safetyScore}
                     className="stroke-current text-primary"
                     cx="50" cy="50" r="45" fill="transparent" strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray={circumference}
-                    strokeDashoffset={circumference - (circumference * analysis.safetyScore) / 100}
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={{ strokeDashoffset: circumference - (circumference * analysis.safetyScore) / 100 }}
+                    transition={{ duration: 1.0, ease: 'easeOut', delay: 0.2 }}
                     style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-xs font-medium text-[#616f89] dark:text-gray-400">안전 점수</span>
-                  <span className="text-3xl font-bold text-primary">{analysis.safetyScore}</span>
+                  <span className="text-3xl font-bold text-primary"><AnimatedScore score={analysis.safetyScore} /></span>
                 </div>
               </div>
             ) : (
@@ -154,15 +197,53 @@ export default function ProductDetailPage() {
             </div>
           )}
 
+          {(analysis?.skinImpacts ?? []).length > 0 && (
+            <div className="mt-2 p-4">
+              <h3 className="text-lg font-bold text-[#111318] dark:text-white">내 피부에 미치는 영향</h3>
+              <motion.div
+                className="mt-4 flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-gray-900/50"
+                variants={listVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {[...(analysis?.skinImpacts ?? [])].sort((a, b) => {
+                  const ai = SKIN_IMPACT_ORDER.indexOf(a.label)
+                  const bi = SKIN_IMPACT_ORDER.indexOf(b.label)
+                  return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi)
+                }).map((impact, i) => (
+                  <motion.div key={impact.label} variants={itemVariants} className="flex items-center gap-4">
+                    <span className="w-16 shrink-0 text-sm font-medium text-[#616f89] dark:text-gray-400">{impact.label}</span>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                      <motion.div
+                        className={`h-full rounded-full ${BAR_COLORS[impact.color]}`}
+                        initial={{ width: '0%' }}
+                        animate={{ width: `${impact.score}%` }}
+                        transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 + i * 0.05 }}
+                      />
+                    </div>
+                    <span className={`w-16 text-right text-sm font-bold ${TEXT_COLORS[impact.color]}`}>{impact.level}</span>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          )}
+
           <div className="mt-4 flex flex-col gap-4 p-4">
-            <h3 className="text-lg font-bold text-[#111318] dark:text-white">전 성분 리스트</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[#111318] dark:text-white">전 성분 리스트</h3>
+              {hasAnalyzed && (
+                <span className="text-xs text-[#616f89] dark:text-gray-400">
+                  대표 {primaryIngredients.length}개
+                </span>
+              )}
+            </div>
             <motion.div
               className="flex flex-col gap-2"
               variants={listVariants}
               initial="hidden"
               animate="visible"
             >
-              {product.ingredients.map((ing) => {
+              {visibleIngredients.map((ing) => {
                 const aiIng = analysisMap.get(ing.inciName)
                 const safetyLevel = aiIng?.safetyLevel
                 return (
@@ -190,10 +271,25 @@ export default function ProductDetailPage() {
                     {aiIng?.assessment && (
                       <p className="mt-1 pl-7 text-xs text-[#616f89] dark:text-gray-500">{aiIng.assessment}</p>
                     )}
+                    {aiIng?.reason && (
+                      <p className="mt-0.5 pl-7 text-xs leading-relaxed text-[#111318] dark:text-gray-200">{aiIng.reason}</p>
+                    )}
                   </motion.div>
                 )
               })}
             </motion.div>
+            {secondaryIngredients.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                className="flex w-full items-center justify-center gap-1 rounded-xl border border-gray-200 bg-white py-2.5 text-sm font-medium text-[#616f89] dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-400"
+              >
+                <span>{isExpanded ? '접기' : `나머지 ${secondaryIngredients.length}개 성분 보기`}</span>
+                <span className="material-symbols-outlined text-base">
+                  {isExpanded ? 'expand_less' : 'expand_more'}
+                </span>
+              </button>
+            )}
           </div>
 
           {analysis?.recommendations && analysis.recommendations.length > 0 && (
@@ -214,28 +310,6 @@ export default function ProductDetailPage() {
                   ))}
                 </motion.ul>
               </div>
-            </div>
-          )}
-
-          {(analysis?.skinImpacts ?? []).length > 0 && (
-            <div className="mt-2 p-4">
-              <h3 className="text-lg font-bold text-[#111318] dark:text-white">내 피부에 미치는 영향</h3>
-              <motion.div
-                className="mt-4 flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-gray-900/50"
-                variants={listVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                {(analysis?.skinImpacts ?? []).map((impact) => (
-                  <motion.div key={impact.label} variants={itemVariants} className="flex items-center gap-4">
-                    <span className="w-16 shrink-0 text-sm font-medium text-[#616f89] dark:text-gray-400">{impact.label}</span>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                      <div className={`h-full rounded-full ${BAR_COLORS[impact.color]}`} style={{ width: `${impact.score}%` }} />
-                    </div>
-                    <span className={`w-16 text-right text-sm font-bold ${TEXT_COLORS[impact.color]}`}>{impact.level}</span>
-                  </motion.div>
-                ))}
-              </motion.div>
             </div>
           )}
 

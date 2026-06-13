@@ -195,9 +195,7 @@ export default function RoutinePage() {
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden pb-24">
       {/* 헤더 */}
       <div className="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
-        <Link to="/home" className="flex size-12 shrink-0 items-center">
-          <span className="material-symbols-outlined text-[#111318] dark:text-white">arrow_back_ios_new</span>
-        </Link>
+        <div className="flex size-12 shrink-0 items-center" />
         <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
           루틴 관리
         </h2>

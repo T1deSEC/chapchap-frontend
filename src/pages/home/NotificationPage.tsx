@@ -33,6 +33,7 @@ export default function NotificationPage() {
     >
       <SubpageHeader
         title="알림"
+        backTo="/home"
         rightAction={
           notifications.length > 0 ? (
             <button

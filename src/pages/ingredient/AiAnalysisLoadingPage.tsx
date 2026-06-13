@@ -2,13 +2,17 @@ import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAiIngredientAnalysisMutation } from '../../hooks/useIngredient'
+import { useToast } from '../../hooks/useToast'
 
 export default function AiAnalysisLoadingPage() {
   const { state } = useLocation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { showError } = useToast()
   const productId: number = state?.productId ?? 0
-  const { mutateAsync: runAnalysis } = useAiIngredientAnalysisMutation(productId)
+  const skinType: string = state?.skinType ?? ''
+  const skinConcerns: string[] = state?.skinConcerns ?? []
+  const { mutateAsync: runAnalysis } = useAiIngredientAnalysisMutation(productId, skinType, skinConcerns)
 
   useEffect(() => {
     if (!productId) {
@@ -20,8 +24,10 @@ export default function AiAnalysisLoadingPage() {
         queryClient.setQueryData(['productAiAnalysis', productId], data)
         navigate(`/ingredient/${productId}`, { replace: true })
       })
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .catch(() => navigate(`/ingredient/${productId}`, { replace: true }))
+      .catch(() => {
+        showError('AI 분석 중 오류가 발생했습니다')
+        navigate(`/ingredient/${productId}`, { replace: true })
+      })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

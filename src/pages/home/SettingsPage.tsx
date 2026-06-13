@@ -48,7 +48,7 @@ export default function SettingsPage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark"
     >
-      <SubpageHeader title="설정" />
+      <SubpageHeader title="설정" backTo="/home" />
 
       <main className="flex-1 px-4 py-6">
         <div className="flex flex-col gap-8">

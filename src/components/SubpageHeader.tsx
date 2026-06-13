@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom'
 interface SubpageHeaderProps {
   title: string
   onBack?: () => void
+  backTo?: string
   rightAction?: ReactNode
 }
 
-export function SubpageHeader({ title, onBack, rightAction }: SubpageHeaderProps) {
+export function SubpageHeader({ title, onBack, backTo, rightAction }: SubpageHeaderProps) {
   const navigate = useNavigate()
-  const handleBack = onBack ?? (() => navigate(-1))
+  const handleBack = onBack ?? (() => (backTo ? navigate(backTo) : navigate(-1)))
 
   return (
     <header className="sticky top-0 z-10 h-14 bg-white/90 backdrop-blur-sm border-b border-gray-100 dark:bg-gray-900/90 dark:border-gray-800 flex items-center px-4">

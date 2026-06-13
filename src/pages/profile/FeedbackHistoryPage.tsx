@@ -45,7 +45,7 @@ export default function FeedbackHistoryPage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden"
     >
-      <SubpageHeader title="내 피드백 기록" />
+      <SubpageHeader title="내 피드백 기록" backTo="/profile" />
       <main className="flex-grow pb-24">
         {isLoading ? (
           <div className="flex flex-col gap-3 p-4 animate-pulse">

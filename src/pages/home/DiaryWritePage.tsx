@@ -57,7 +57,7 @@ export default function DiaryWritePage() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark"
     >
-      <SubpageHeader title="오늘의 피부 기록" />
+      <SubpageHeader title="오늘의 피부 기록" backTo="/home" />
 
       <main className="flex-grow overflow-y-auto p-6 pb-28 space-y-8">
         {/* 기분 선택 */}

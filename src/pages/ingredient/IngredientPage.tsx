@@ -304,7 +304,7 @@ export default function IngredientPage() {
         </div>
       )}
 
-      {searchResults.length > 0 && (
+      {debouncedQuery && searchResults.length > 0 && (
         <div className="px-4">
           <h2 className="pb-3 pt-2 text-base font-bold text-[#111318] dark:text-white">
             검색 결과

@@ -123,7 +123,7 @@ export default function ProductPickerSheet({ isOpen, onClose, existingProductIds
           ) : allProducts.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-400">검색 결과가 없습니다</p>
           ) : (
-            <div className="grid grid-cols-2 gap-3 py-2">
+            <div className="flex flex-col gap-2 py-2">
               {allProducts.map((product) => {
                 const isAdded = existingProductIds.has(product.id)
                 const isSelected = selected.has(product.id)
@@ -133,7 +133,7 @@ export default function ProductPickerSheet({ isOpen, onClose, existingProductIds
                     type="button"
                     onClick={() => toggleSelect(product)}
                     disabled={isAdded}
-                    className={`relative flex flex-col items-start rounded-xl border-2 p-3 text-left transition-colors ${
+                    className={`flex items-center gap-3 rounded-xl border-2 p-2.5 text-left transition-colors ${
                       isAdded
                         ? 'border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 opacity-50'
                         : isSelected
@@ -141,20 +141,22 @@ export default function ProductPickerSheet({ isOpen, onClose, existingProductIds
                         : 'border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800'
                     }`}
                   >
-                    {(isAdded || isSelected) && (
-                      <div className={`absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full ${isAdded ? 'bg-gray-300' : 'bg-primary'}`}>
-                        <span className="material-symbols-outlined text-white" style={{ fontSize: '14px' }}>check</span>
-                      </div>
-                    )}
                     {product.imageUrl ? (
-                      <img src={product.imageUrl} alt={product.name} className="mb-2 h-16 w-full rounded-lg object-cover" />
+                      <img src={product.imageUrl} alt={product.name} className="h-14 w-14 flex-shrink-0 rounded-lg object-cover" />
                     ) : (
-                      <div className="mb-2 flex h-16 w-full items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+                      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
                         <span className="material-symbols-outlined text-gray-300">image</span>
                       </div>
                     )}
-                    <p className="line-clamp-1 text-xs font-semibold text-gray-900 dark:text-gray-100">{product.name}</p>
-                    <p className="line-clamp-1 text-xs text-gray-400">{product.brand}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-1 text-sm font-semibold text-gray-900 dark:text-gray-100">{product.name}</p>
+                      <p className="line-clamp-1 text-xs text-gray-400">{product.brand}</p>
+                    </div>
+                    {(isAdded || isSelected) && (
+                      <div className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${isAdded ? 'bg-gray-300' : 'bg-primary'}`}>
+                        <span className="material-symbols-outlined text-white" style={{ fontSize: '14px' }}>check</span>
+                      </div>
+                    )}
                   </button>
                 )
               })}

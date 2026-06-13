@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useUpdateSkinProfileMutation, useProfile } from '../../hooks/useProfile'
 import Button from '../../components/ui/Button'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
-import type { UserProfile } from '../../types'
+import type { UserProfile, SkinProfilePayload } from '../../types'
 
 const SKIN_TYPES = ['지성', '건성', '복합성', '수부지', '민감성']
 const SKIN_CONCERNS = ['여드름', '붉은 기/홍조', '주름/탄력 저하', '건조함/속당김', '모공', '잡티/색소침착']
@@ -16,6 +16,8 @@ function SkinProfileSetupForm({ profile }: { profile: UserProfile | null }) {
   const [skinConcerns, setSkinConcerns] = useState<string[]>(profile?.skinConcerns ?? [])
   const [gender, setGender] = useState(profile?.gender ?? '')
   const [birthYear, setBirthYear] = useState(profile?.birthYear ? String(profile.birthYear) : '')
+  const [showWarning, setShowWarning] = useState(false)
+  const [pendingPayload, setPendingPayload] = useState<SkinProfilePayload | null>(null)
   const { mutate, isPending } = useUpdateSkinProfileMutation()
 
   const toggleConcern = (c: string) =>
@@ -23,15 +25,35 @@ function SkinProfileSetupForm({ profile }: { profile: UserProfile | null }) {
       prev.includes(c) ? prev.filter((x) => x !== c) : prev.length >= MAX_CONCERNS ? prev : [...prev, c]
     )
 
+  const skinProfileChanged = () => {
+    if (skinType !== (profile?.skinType ?? '건성')) return true
+    const existing = [...(profile?.skinConcerns ?? [])].sort().join(',')
+    const next = [...skinConcerns].sort().join(',')
+    return existing !== next
+  }
+
   const handleSave = () => {
     const yearNum = birthYear ? parseInt(birthYear, 10) : undefined
     if (yearNum !== undefined && (isNaN(yearNum) || yearNum < 1900 || yearNum > CURRENT_YEAR)) {
       return
     }
-    mutate(
-      { skinType, skinConcerns, gender: gender || undefined, birthYear: yearNum },
-      { onSuccess: () => navigate('/profile') }
-    )
+    const payload: SkinProfilePayload = { skinType, skinConcerns, gender: gender || undefined, birthYear: yearNum }
+    if (skinProfileChanged()) {
+      setPendingPayload(payload)
+      setShowWarning(true)
+    } else {
+      mutate(payload, { onSuccess: () => navigate('/profile') })
+    }
+  }
+
+  const handleConfirmSave = () => {
+    if (!pendingPayload) return
+    mutate(pendingPayload, {
+      onSuccess: () => {
+        setShowWarning(false)
+        navigate('/profile')
+      },
+    })
   }
 
   return (
@@ -113,6 +135,34 @@ function SkinProfileSetupForm({ profile }: { profile: UserProfile | null }) {
       <div className="fixed bottom-24 left-0 right-0 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4">
         <Button fullWidth onClick={handleSave} loading={isPending}>변경사항 저장하기</Button>
       </div>
+
+      {showWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6">
+          <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-xl">
+            <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">피부 설정 변경</h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              피부 타입 또는 피부 고민이 변경되면 AI 성분 분석 및 추천 데이터가 초기화됩니다. 계속할까요?
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowWarning(false)}
+                className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSave}
+                disabled={isPending}
+                className="flex-1 rounded-xl bg-primary py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {isPending ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -122,5 +172,6 @@ export default function SkinProfileSetupPage() {
   if (isLoading) {
     return <div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>
   }
-  return <SkinProfileSetupForm profile={profile ?? null} />
+  const formKey = `${profile?.skinType ?? ''}:${[...(profile?.skinConcerns ?? [])].sort().join(',')}`
+  return <SkinProfileSetupForm key={formKey} profile={profile ?? null} />
 }

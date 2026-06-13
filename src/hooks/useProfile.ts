@@ -8,6 +8,7 @@ import {
   updatePassword,
 } from '../api/profile'
 import type { SkinProfilePayload, NotificationSettings } from '../types'
+import { useAuthStore } from '../store/authStore'
 
 export const useProfile = () =>
   useQuery({
@@ -19,7 +20,12 @@ export const useUpdateSkinProfileMutation = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (payload: SkinProfilePayload) => updateSkinProfile(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['profile'] }),
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ['profile'] })
+      qc.invalidateQueries({ queryKey: ['ingredient-recommendation'] })
+      qc.invalidateQueries({ queryKey: ['productAiAnalysis'] })
+      useAuthStore.getState().updateUser({ skinType: variables.skinType })
+    },
   })
 }
 

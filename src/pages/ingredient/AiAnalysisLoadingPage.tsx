@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAiIngredientAnalysisMutation } from '../../hooks/useIngredient'
@@ -13,12 +13,15 @@ export default function AiAnalysisLoadingPage() {
   const skinType: string = state?.skinType ?? ''
   const skinConcerns: string[] = state?.skinConcerns ?? []
   const { mutateAsync: runAnalysis } = useAiIngredientAnalysisMutation(productId, skinType, skinConcerns)
+  const hasStarted = useRef(false)
 
   useEffect(() => {
     if (!productId) {
       navigate('/ingredient', { replace: true })
       return
     }
+    if (hasStarted.current) return
+    hasStarted.current = true
     runAnalysis()
       .then((data) => {
         queryClient.setQueryData(['productAiAnalysis', productId], data)

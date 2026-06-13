@@ -1,6 +1,8 @@
 # CHAPCHAP Frontend
 
-스킨케어 루틴 관리 및 AI 성분 분석 앱 **CHAPCHAP**의 React 프론트엔드입니다.
+AI 기반 개인화 뷰티 플랫폼 **CHAPCHAP**의 React 프론트엔드입니다.
+
+🔗 **[배포 서비스](http://54.116.209.11/)** · **[Backend Repo](https://github.com/T1deSEC/chapchap-backend)** · **[Wiki](https://github.com/T1deSEC/chapchap-wiki)**
 
 ---
 
@@ -13,12 +15,14 @@
 | 라우팅 | React Router v6 |
 | 서버 상태 | TanStack Query v5 |
 | 클라이언트 상태 | Zustand |
-| API 통신 | Axios (JWT 인터셉터) |
+| 애니메이션 | Framer Motion |
+| 드래그&드롭 | dnd-kit (core + sortable) |
+| API 통신 | Axios (JWT 인터셉터 + ApiResponse 자동 unwrap) |
 | 폼 검증 | React Hook Form + Zod |
 | 테스트 | Vitest + React Testing Library |
 
-백엔드: **Spring Boot REST API** (`localhost:8080`)  
-DB: **PostgreSQL**
+백엔드: **Spring Boot REST API** (`:8080`)  
+DB: **PostgreSQL 16**
 
 ---
 
@@ -27,10 +31,10 @@ DB: **PostgreSQL**
 | 탭 | 화면 |
 |----|------|
 | 인증 | 로그인, 회원가입 |
-| 홈 | 홈, 일기작성, 일기상세, 추천제품, 알림, 설정 |
-| 성분 | 성분홈, 제품성분분석, AI로딩, AI결과, 피드백입력 |
-| 루틴 | 루틴관리, AI루틴로딩, AI루틴결과 |
-| 마이 | 프로필홈, 피부프로필재설정, 찜한제품, 피드백기록 |
+| 홈 | 홈, 일기 작성, 일기 상세, 추천 제품, 알림, 설정 |
+| 성분 | 성분 홈, 제품 성분 분석, AI 분석 로딩, AI 분석 결과, 피드백 입력 |
+| 루틴 | 루틴 관리, AI 루틴 진단 로딩, AI 루틴 진단 결과 |
+| 마이 | 프로필 홈, 피부 프로필 재설정, 찜한 제품, 피드백 기록 |
 
 ---
 
@@ -52,19 +56,17 @@ cd chapchap-frontend
 # 2. 의존성 설치
 npm install
 
-# 3. 환경변수 설정
-# .env 파일이 없으면 생성
-echo "VITE_API_BASE_URL=" > .env
-
-# 4. 개발 서버 실행
+# 3. 개발 서버 실행
 npm run dev
 # → http://localhost:5173
 ```
 
+`/api/*` 요청은 Vite dev 서버가 자동으로 `localhost:8080`으로 프록시합니다.
+
 ### 백엔드 없이 UI 확인하기
 
-개발 서버 실행 후 로그인 화면(`/login`) 하단의 **[개발용] 백엔드 없이 로그인** 버튼을 클릭합니다.  
-이 버튼은 `development` 환경에서만 표시되며 프로덕션 빌드에는 포함되지 않습니다.
+개발 서버 실행 후 로그인 화면 하단의 **[개발용] 백엔드 없이 로그인** 버튼을 클릭합니다.  
+`import.meta.env.DEV === true` 환경에서만 표시되며 프로덕션 빌드에는 포함되지 않습니다.
 
 ### 환경변수
 
@@ -72,18 +74,22 @@ npm run dev
 |------|------|--------|
 | `VITE_API_BASE_URL` | Spring Boot 서버 URL | 빈 값 (Vite proxy 사용) |
 
-`VITE_API_BASE_URL`을 비워두면 Vite dev 서버가 `/api/*` 요청을 `localhost:8080`으로 자동 프록시합니다.
-
 ---
 
 ## 주요 명령어
 
 ```bash
 npm run dev          # 개발 서버 실행
-npm run build        # 프로덕션 빌드
+npm run build        # 프로덕션 빌드 (tsc + vite build)
+npm run lint         # ESLint 검사
 npm test             # 테스트 1회 실행
 npm run test:watch   # 테스트 watch 모드
 npm run test:ui      # 테스트 결과 UI 대시보드
+```
+
+단일 테스트 파일 실행:
+```bash
+npx vitest run src/pages/home/__tests__/HomePage.test.tsx
 ```
 
 ---
@@ -92,41 +98,38 @@ npm run test:ui      # 테스트 결과 UI 대시보드
 
 ```
 src/
-├── api/          # Axios API 함수 (엔드포인트별 분리)
+├── api/              # Axios API 함수 (도메인별 분리)
+│   └── client.ts     # Axios 인스턴스, JWT 인터셉터, ApiResponse 자동 unwrap
 ├── components/
-│   ├── layout/   # AppLayout (AuthGuard), BottomNav
-│   └── ui/       # Button, Input, Chip, LoadingSpinner
-├── hooks/        # TanStack Query 커스텀 훅
-├── pages/        # 탭별 서브폴더 (auth/home/ingredient/routine/profile)
-├── store/        # Zustand 스토어 (authStore, analysisStore)
-├── types/        # TypeScript 타입 정의
-├── App.tsx       # 라우터 정의
-└── main.tsx      # QueryClientProvider 루트
+│   ├── layout/       # AppLayout (AuthGuard), BottomNav, SubpageHeader
+│   └── ui/           # Button, Input, Chip, LoadingSpinner, Toast
+├── hooks/            # TanStack Query 커스텀 훅 (도메인별 1파일)
+├── pages/            # 탭별 서브폴더 (auth/home/ingredient/routine/profile)
+├── store/
+│   ├── authStore.ts      # 인증 상태 (localStorage persist)
+│   └── analysisStore.ts  # AI 분석 결과 임시 저장 (in-memory)
+├── types/            # TypeScript 타입 정의 (백엔드 DTO 1:1 대응)
+├── App.tsx           # React Router 정의
+└── main.tsx          # QueryClientProvider, ToastProvider 루트
 ```
+
+### 핵심 아키텍처 패턴
+
+**인증 가드**  
+모든 보호 경로는 `<AppLayout />`의 자식입니다. AppLayout이 `useAuthStore.isAuthenticated`를 확인해 미인증 시 `/login`으로 리다이렉트합니다. 별도 route-level guard는 없습니다.
+
+**API 응답 자동 unwrap**  
+`client.ts` 인터셉터가 `{ success, data, message }` 래퍼를 자동으로 벗겨냅니다. 훅에서 `r.data`는 이미 실제 페이로드입니다.
+
+**AI 분석 2단계 플로우**  
+`useAnalysisStore`가 로딩 페이지(API 호출) → 결과 페이지(스토어에서 읽기) 브릿지를 담당합니다. 결과 소비 후 스토어를 초기화해야 합니다.
+
+**루틴 드래그&드롭**  
+`RoutinePage`에서 `DndContext` + `SortableContext` + `arrayMove`로 순서 재정렬 후 PUT으로 저장합니다.
 
 ---
 
-## GitHub 컨벤션
-
-### 브랜치 전략
-
-```
-master          ← 배포 가능한 상태 유지
-└── feat/...    ← 신규 기능
-└── fix/...     ← 버그 수정
-└── chore/...   ← 설정, 의존성, 빌드
-└── refactor/...← 리팩토링
-```
-
-**브랜치 명명 예시**
-
-```
-feat/home-diary-calendar
-fix/auth-redirect-loop
-chore/update-dependencies
-```
-
-### 커밋 메시지
+## 커밋 컨벤션
 
 ```
 <type>: <한 줄 설명>
@@ -141,28 +144,4 @@ chore/update-dependencies
 | `test` | 테스트 추가/수정 |
 | `style` | 포맷, 오타 등 (로직 변화 없음) |
 
-**예시**
-```
-feat: add diary write page with mood selection
-fix: resolve auth redirect loop on token expiry
-chore: upgrade tanstack query to v5.1
-```
-
-### Pull Request
-
-1. `master`에 직접 push 금지 — 반드시 브랜치 생성 후 PR
-2. PR 제목은 커밋 메시지 형식과 동일하게 작성
-3. 머지 전 `npm test` 통과 확인
-4. PR 본문에 **변경 내용 요약** 및 **테스트 방법** 기재
-
-**PR 본문 템플릿**
-
-```markdown
-## 변경 내용
-- 
-
-## 테스트 방법
-1. 
-
-## 스크린샷 (UI 변경 시)
-```
+브랜치 접두사: `feat/`, `fix/`, `chore/`, `refactor/`

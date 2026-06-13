@@ -15,7 +15,7 @@ const SKIN_TYPES = ['건성', '지성', '복합성', '민감성', '중성']
 const schema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
   email: z.string().email('유효한 이메일을 입력해주세요'),
-  password: z.string().min(6, '비밀번호는 6자 이상이어야 합니다'),
+  password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
   registrationToken: z.string().min(1, '가입 코드를 입력해주세요'),
 })
 
